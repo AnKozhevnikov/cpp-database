@@ -3,12 +3,30 @@
 #include <any>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
 class DataBase
 {
+  public:
+    auto query(std::string q);
   private:
+    class Response
+    {
+        // TODO: implement
+    };
+
+    class Condition
+    {
+        // TODO: implement
+    };
+
+    class Expression
+    {
+        // TODO: implement
+    };
+
     enum Types
     {
         Int,
@@ -80,6 +98,28 @@ class DataBase
         const int sz;
         std::vector<std::unique_ptr<Cell>> v;
     };
-    std::map<std::string, ColumnInfo> columns;
-    std::vector<Row> db;
+
+    class Table
+    {
+      public:
+        Table() = default;
+
+      private:
+        std::map<std::string, ColumnInfo> columns;
+        std::vector<Row> db;
+        std::string name;
+
+        Response createTable(std::vector<std::tuple<std::string, std::optional<std::any>, int>> info);
+        Response insert(std::vector<std::unique_ptr<Cell>> row);
+        Table select(std::vector<std::string> cols, Condition cond);
+        Response update(Condition cond, std::vector<std::pair<std::string, Expression>> v);
+        Response del(Condition cond);
+    };
+
+    Response createTable(std::string s, std::vector<std::tuple<std::string, std::optional<std::any>, int>> info);
+    Response insert(std::string s, std::vector<std::unique_ptr<Cell>> row);
+    Table select(std::string s, std::vector<std::string> cols, Condition cond);
+    Response update(std::string s, Condition cond, std::vector<std::pair<std::string, Expression>> v);
+    Response del(std::string s, Condition cond);
+    Table join(std::string t1, std::string t2, Condition cond);
 };
