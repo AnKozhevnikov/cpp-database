@@ -122,4 +122,6 @@ class DataBase
     Response update(std::string s, Condition cond, std::vector<std::pair<std::string, Expression>> v);
     Response del(std::string s, Condition cond);
     Table join(std::string t1, std::string t2, Condition cond);
+
+    std::map<std::string, Table> tables;
 };
