@@ -67,7 +67,7 @@ std::unique_ptr<DataBase::Cell> DataBase::Cell::opOr(const std::unique_ptr<Cell>
     throw std::runtime_error("This operation is not implemented");
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::Cell::opNot(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<DataBase::Cell> DataBase::Cell::opNot() const
 {
     throw std::runtime_error("This operation is not implemented");
 }

@@ -1,5 +1,4 @@
 #include <DataBase.h>
-
 #include <stdexcept>
 
 std::unique_ptr<DataBase::Cell> DataBase::IntCell::opPlus(const std::unique_ptr<Cell> &right) const

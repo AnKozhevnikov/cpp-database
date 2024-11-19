@@ -4,32 +4,32 @@
 
 bool DataBase::StringCell::opG(const std::unique_ptr<Cell> &right) const
 {
-    return value > dynamic_cast<const StringCell &>(*right).value;
+    return value.compare(dynamic_cast<const StringCell &>(*right).value) > 0;
 }
 
 bool DataBase::StringCell::opL(const std::unique_ptr<Cell> &right) const
 {
-    return value < dynamic_cast<const StringCell &>(*right).value;
+    return value.compare(dynamic_cast<const StringCell &>(*right).value) < 0;
 }
 
 bool DataBase::StringCell::opEq(const std::unique_ptr<Cell> &right) const
 {
-    return value == dynamic_cast<const StringCell &>(*right).value;
+    return value.compare(dynamic_cast<const StringCell &>(*right).value) == 0;
 }
 
 bool DataBase::StringCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
-    return value >= dynamic_cast<const StringCell &>(*right).value;
+    return opG(right) || opEq(right);
 }
 
 bool DataBase::StringCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
-    return value <= dynamic_cast<const StringCell &>(*right).value;
+    return opL(right) || opEq(right);
 }
 
 bool DataBase::StringCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
-    return value != dynamic_cast<const StringCell &>(*right).value;
+    return !opEq(right);
 }
 
 std::unique_ptr<DataBase::Cell> DataBase::StringCell::opPlus(const std::unique_ptr<Cell> &right) const
