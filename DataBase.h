@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <list>
 #include <vector>
 
 #define UNIQUE 1
@@ -56,7 +57,7 @@ class DataBase
         virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
         virtual std::unique_ptr<Cell> opAnd(const std::unique_ptr<Cell> &right) const;
         virtual std::unique_ptr<Cell> opOr(const std::unique_ptr<Cell> &right) const;
-        virtual std::unique_ptr<Cell> opNot(const std::unique_ptr<Cell> &right) const;
+        virtual std::unique_ptr<Cell> opNot() const;
         virtual std::unique_ptr<Cell> opXor(const std::unique_ptr<Cell> &right) const;
         virtual int opAbs() const;
     };
@@ -89,6 +90,9 @@ class DataBase
         virtual bool opGeq(const std::unique_ptr<Cell> &right) const;
         virtual bool opLeq(const std::unique_ptr<Cell> &right) const;
         virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
+        virtual std::unique_ptr<Cell> opOr(const std::unique_ptr<Cell> &right) const;
+        virtual std::unique_ptr<Cell> opAnd(const std::unique_ptr<Cell> &right) const;
+        virtual std::unique_ptr<Cell> opNot() const;
         bool value;
     };
 
@@ -150,7 +154,7 @@ class DataBase
 
       private:
         std::map<std::string, ColumnInfo> columns;
-        std::vector<Row> db;
+        std::list<Row> db;
         std::string name;
 
         Response createTable(std::vector<std::tuple<std::string, std::optional<std::any>, int>> info);
