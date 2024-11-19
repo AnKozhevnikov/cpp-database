@@ -2,6 +2,10 @@
 
 #include <stdexcept>
 
+void DataBase::IntCell::inc() {
+    ++value;
+}
+
 std::unique_ptr<DataBase::Cell> DataBase::IntCell::opPlus(const std::unique_ptr<Cell> &right) const
 {
     return std::make_unique<IntCell>(value + dynamic_cast<const IntCell &>(*right).value);
