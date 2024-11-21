@@ -2,6 +2,16 @@
 
 #include <stdexcept>
 
+std::string DataBase::StringCell::toString()
+{
+    return value;
+}
+
+std::unique_ptr<DataBase::Cell> DataBase::StringCell::clone()
+{
+    return std::make_unique<StringCell>(value);
+}
+
 bool DataBase::StringCell::opG(const std::unique_ptr<Cell> &right) const
 {
     return value.compare(dynamic_cast<const StringCell &>(*right).value) > 0;

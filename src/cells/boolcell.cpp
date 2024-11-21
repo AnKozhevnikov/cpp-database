@@ -2,6 +2,25 @@
 
 #include <stdexcept>
 
+std::string DataBase::BoolCell::toString()
+{
+    std::string ret;
+    if (value)
+    {
+        ret = "1";
+    }
+    else
+    {
+        ret = "0";
+    }
+    return ret;
+}
+
+std::unique_ptr<DataBase::Cell> DataBase::BoolCell::clone()
+{
+    return std::make_unique<BoolCell>(value);
+}
+
 bool DataBase::BoolCell::opG(const std::unique_ptr<Cell> &right) const
 {
     return value > dynamic_cast<const BoolCell &>(*right).value;

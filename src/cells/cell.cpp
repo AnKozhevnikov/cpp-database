@@ -2,6 +2,10 @@
 
 #include <stdexcept>   
 
+std::string DataBase::Cell::toString() {
+    throw std::runtime_error("This operation is not implemented");
+}
+
 void DataBase::Cell::inc() {
     throw std::runtime_error("This operation is not implemented");
 }

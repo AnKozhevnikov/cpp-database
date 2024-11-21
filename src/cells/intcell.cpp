@@ -1,8 +1,16 @@
 #include <DataBase.h>
 #include <stdexcept>
 
+std::string DataBase::IntCell::toString() {
+    return std::to_string(value);
+}
+
 void DataBase::IntCell::inc() {
     ++value;
+}
+
+std::unique_ptr<DataBase::Cell> DataBase::IntCell::clone() {
+    return std::make_unique<IntCell>(value);
 }
 
 std::unique_ptr<DataBase::Cell> DataBase::IntCell::opPlus(const std::unique_ptr<Cell> &right) const

@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,9 +15,6 @@
 
 class DataBase
 {
-  public:
-    auto query(std::string q);
-
   private:
     class Condition
     {
@@ -41,6 +39,11 @@ class DataBase
       public:
         virtual std::unique_ptr<Cell> clone() = 0;
         virtual void inc();
+        virtual std::string toString();
+        Cell(std::string s)
+        {
+        }
+        Cell() = default;
 
         virtual std::unique_ptr<Cell> opPlus(const std::unique_ptr<Cell> &right) const;
         virtual std::unique_ptr<Cell> opMinus(const std::unique_ptr<Cell> &right) const;
@@ -64,6 +67,10 @@ class DataBase
     {
       public:
         virtual std::unique_ptr<Cell> clone();
+        virtual std::string toString();
+        IntCell(std::string s) : value(std::stoi(s))
+        {
+        }
 
         IntCell(int v) : value(v)
         {
@@ -87,6 +94,10 @@ class DataBase
     {
       public:
         virtual std::unique_ptr<Cell> clone();
+        virtual std::string toString();
+        BoolCell(std::string s) : value(s == "1")
+        {
+        }
 
         BoolCell(bool v) : value(v)
         {
@@ -107,6 +118,7 @@ class DataBase
     {
       public:
         virtual std::unique_ptr<Cell> clone();
+        virtual std::string toString();
 
         StringCell(std::string v) : value(v)
         {
@@ -126,8 +138,10 @@ class DataBase
     {
       public:
         virtual std::unique_ptr<Cell> clone();
+        virtual std::string toString();
+        ByteArrayCell(std::string s);
 
-        ByteArrayCell(int size, std::vector<int8_t> v) : value(v), sz(size)
+        ByteArrayCell(std::vector<int8_t> v) : value(v)
         {
         }
         virtual bool opG(const std::unique_ptr<Cell> &right) const;
@@ -136,14 +150,13 @@ class DataBase
         virtual bool opGeq(const std::unique_ptr<Cell> &right) const;
         virtual bool opLeq(const std::unique_ptr<Cell> &right) const;
         virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
-        unsigned int sz;
         std::vector<int8_t> value;
     };
 
     class Creator
     {
       public:
-        template <class... T> std::unique_ptr<Cell> generateCell(Types type, T... args);
+        std::unique_ptr<Cell> generateCell(Types type, std::any arg);
     };
 
     class ColumnInfo
@@ -166,6 +179,11 @@ class DataBase
 
         unsigned int sz;
         std::vector<std::unique_ptr<Cell>> v;
+
+        Row(const Row &other) = delete;                 // Disable copy constructor
+        Row(Row &&other) noexcept = default;            // Enable move constructor
+        Row &operator=(const Row &other) = delete;      // Disable copy assignment
+        Row &operator=(Row &&other) noexcept = default; // Enable move assignment
     };
 
     class Table
@@ -176,6 +194,11 @@ class DataBase
         {
         }
 
+        bool is_ok()
+        {
+            return status;
+        }
+
       private:
         std::map<std::string, ColumnInfo> columns;
         std::list<Row> rows;
@@ -183,14 +206,19 @@ class DataBase
 
         bool status;
 
-        Table createTable(std::vector<std::tuple<std::string, std::optional<std::any>, int>> info);
         Table insert(std::vector<std::optional<std::any>> row);
+
+        void save(std::string path);
 
         friend class DataBase;
     };
 
     Table createTable(std::string s, std::vector<std::tuple<std::string, Types, std::optional<std::any>, int>> info);
     Table insert(std::string s, std::vector<std::optional<std::any>> row);
-    
+
     std::map<std::string, Table> tables;
+
+  public:
+    Table query(std::string q);
+    void save(std::string path);
 };
