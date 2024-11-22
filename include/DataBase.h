@@ -157,6 +157,7 @@ class DataBase
     {
       public:
         std::unique_ptr<Cell> generateCell(Types type, std::any arg);
+        std::optional<std::any> generateValue(Types type, std::string s);
     };
 
     class ColumnInfo
@@ -201,6 +202,7 @@ class DataBase
 
       private:
         std::map<std::string, ColumnInfo> columns;
+        std::map<int, std::string> columnOrder;
         std::list<Row> rows;
         std::string name;
 
@@ -209,6 +211,7 @@ class DataBase
         Table insert(std::vector<std::optional<std::any>> row);
 
         void save(std::string path);
+        void load(std::string path);
 
         friend class DataBase;
     };
@@ -221,4 +224,5 @@ class DataBase
   public:
     Table query(std::string q);
     void save(std::string path);
+    void load(std::string path);
 };
