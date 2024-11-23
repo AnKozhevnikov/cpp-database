@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <cctype>
 #include <map>
-#include <vector>
 #include <stdexcept>
+#include <vector>
 /*
 So, we're gonna have 2 types of parsers
 
@@ -11,16 +11,6 @@ So, we're gonna have 2 types of parsers
 2. Reverse polish -> applying all operations
 
 */
-
-static std::map<Token::Token_types, int> operations_precedence = {
-    {Token::Token_types::Op_not, 0}, 
-    {Token::Token_types::Op_mul, 1},   {Token::Token_types::Op_div, 1}, {Token::Token_types::Op_mod, 1},
-    {Token::Token_types::Op_plus, 2},  {Token::Token_types::Op_minus, 2},
-    {Token::Token_types::Op_eq, 3},  {Token::Token_types::Op_noteq, 3}, {Token::Token_types::Op_l, 3},
-    {Token::Token_types::Op_leq, 3}, {Token::Token_types::Op_g, 3},     {Token::Token_types::Op_geq, 3},
-    {Token::Token_types::Op_and, 4},
-    {Token::Token_types::Op_xor, 5},
-    {Token::Token_types::Op_or, 6}};
 
 // Todo: make everything on shared_ptr
 class Token
@@ -62,7 +52,8 @@ class Token
                 pos += 2;
                 int start = pos;
                 int count = 0;
-                while (isdigit(origin_str[pos]) || (origin_str[pos] >= 'a' && origin_str[pos] <= 'f'))
+                while (std::isdigit((static_cast<unsigned char>(origin_str[pos]))) ||
+                       (origin_str[pos] >= 'a' && origin_str[pos] <= 'f'))
                 {
                     count++;
                     pos++;
@@ -74,7 +65,7 @@ class Token
                 type = Token_types::Const_integer;
                 int start = pos;
                 int count = 0;
-                while (isdigit(origin_str[pos]))
+                while (std::isdigit((static_cast<unsigned char>(origin_str[pos]))))
                 {
                     count++;
                     pos++;
@@ -89,7 +80,7 @@ class Token
             value.reserve(32);
             while (origin_str[pos] != '\"' && origin_str[pos] != '\0')
             {
-                //TODO: Add freaking numeric esacpe seq
+                // TODO: Add freaking numeric esacpe seq
                 if (origin_str[pos] == '\\')
                 {
                     pos++;
@@ -143,24 +134,27 @@ class Token
             {
                 throw std::runtime_error("Unclosed \" was found");
             }
-        } else if (isdigit(origin_str[pos]))
+        }
+        else if (std::isdigit((static_cast<unsigned char>(origin_str[pos]))))
         {
             type = Token_types::Const_integer;
             int start = pos;
             int count = 0;
-            while (isdigit(origin_str[pos]))
+            while (std::isdigit((static_cast<unsigned char>(origin_str[pos]))))
             {
                 count++;
                 pos++;
             }
             value = origin_str.substr(start, count);
         }
-        else if (isalpha(origin_str[pos]))
+        else if (std::isalpha((static_cast<unsigned char>(origin_str[pos]))))
         {
             type = Token_types::Variable;
             int start = pos;
             int count = 0;
-            while (isalpha(origin_str[pos]) || isdigit(origin_str[pos]) || origin_str[pos] == '_' || origin_str[pos] == '.')
+            while (std::isalpha((static_cast<unsigned char>(origin_str[pos]))) ||
+                   std::isdigit((static_cast<unsigned char>(origin_str[pos]))) || origin_str[pos] == '_' ||
+                   origin_str[pos] == '.')
             {
                 count++;
                 pos++;
@@ -282,12 +276,12 @@ class ArithmParser
 
   public:
     ArithmParser() = delete;
-    static std::vector<Token> arithm_parse(std::string origin_str)
+    std::vector<std::shared_ptr<Token>> arithm_parse(std::string origin_str)
     {
         origin_str.push_back('\0');
-        std::vector<Token> output;
-        std::vector<Token> op_stack;
-        std::vector<Token> input;
+        std::vector<std::shared_ptr<Token>> output;
+        std::vector<std::shared_ptr<Token>> op_stack;
+        std::vector<std::shared_ptr<Token>> input;
 
         int cur_pos = 0;
         while (cur_pos != origin_str.length())
@@ -300,30 +294,30 @@ class ArithmParser
             }
             if (origin_str[cur_pos] == '\n')
                 break;
-            input.emplace_back(Token(cur_pos, origin_str));
+            input.emplace_back(std::make_shared<Token>(cur_pos, origin_str));
         }
         reverse(input.begin(), input.end());
 
         // https://en.wikipedia.org/wiki/Shunting_yard_algorithm
-        for (Token &cur_token : input)
+        for (std::shared_ptr<Token> &cur_token : input)
         {
-            if (cur_token.is_operation())
+            if (cur_token->is_operation())
             {
-                while (!op_stack.empty() && operations_precedence[cur_token.get_type()] >=
-                                                operations_precedence[op_stack.back().get_type()])
+                while (!op_stack.empty() && operations_precedence[cur_token->get_type()] >=
+                                                operations_precedence[op_stack.back()->get_type()])
                 {
                     output.emplace_back(op_stack.back());
                     op_stack.pop_back();
                 }
                 op_stack.emplace_back(cur_token);
             }
-            else if (cur_token.get_type() == Token::Token_types::Par_left)
+            else if (cur_token->get_type() == Token::Token_types::Par_left)
             {
                 op_stack.emplace_back(cur_token);
             }
-            else if (cur_token.get_type() == Token::Token_types::Par_right)
+            else if (cur_token->get_type() == Token::Token_types::Par_right)
             {
-                while (!op_stack.empty() && op_stack.back().get_type() != Token::Token_types::Par_left)
+                while (!op_stack.empty() && op_stack.back()->get_type() != Token::Token_types::Par_left)
                 {
                     output.emplace_back(op_stack.back());
                     op_stack.pop_back();
@@ -337,4 +331,11 @@ class ArithmParser
         return output;
     }
 
+  private:
+    std::map<Token::Token_types, int> operations_precedence = {
+        {Token::Token_types::Op_not, 0}, {Token::Token_types::Op_mul, 1},   {Token::Token_types::Op_div, 1},
+        {Token::Token_types::Op_mod, 1}, {Token::Token_types::Op_plus, 2},  {Token::Token_types::Op_minus, 2},
+        {Token::Token_types::Op_eq, 3},  {Token::Token_types::Op_noteq, 3}, {Token::Token_types::Op_l, 3},
+        {Token::Token_types::Op_leq, 3}, {Token::Token_types::Op_g, 3},     {Token::Token_types::Op_geq, 3},
+        {Token::Token_types::Op_and, 4}, {Token::Token_types::Op_xor, 5},   {Token::Token_types::Op_or, 6}};
 };
