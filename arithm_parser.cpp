@@ -12,7 +12,6 @@ So, we're gonna have 2 types of parsers
 
 */
 
-// Todo: make everything on shared_ptr
 class Token
 {
   public:
@@ -98,25 +97,25 @@ class Token
                     case '\\':
                         value.push_back('\\');
                         break;
-                    case '\a':
+                    case 'a':
                         value.push_back('\a');
                         break;
-                    case '\b':
+                    case 'b':
                         value.push_back('\b');
                         break;
-                    case '\f':
+                    case 'f':
                         value.push_back('\f');
                         break;
-                    case '\n':
+                    case 'n':
                         value.push_back('\n');
                         break;
-                    case '\r':
+                    case 'r':
                         value.push_back('\r');
                         break;
-                    case '\t':
+                    case 't':
                         value.push_back('\t');
                         break;
-                    case '\v':
+                    case 'v':
                         value.push_back('\v');
                         break;
                     default:
@@ -339,3 +338,6 @@ class ArithmParser
         {Token::Token_types::Op_leq, 3}, {Token::Token_types::Op_g, 3},     {Token::Token_types::Op_geq, 3},
         {Token::Token_types::Op_and, 4}, {Token::Token_types::Op_xor, 5},   {Token::Token_types::Op_or, 6}};
 };
+
+
+
