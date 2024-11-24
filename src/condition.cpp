@@ -1,10 +1,12 @@
 #include "Condition.h"
 #include "Cell.h"
+#include "ArithmParcer.h"
 #include <vector>
 #include <stdexcept>
 
-Condition::Condition(std::vector<std::shared_ptr<Token>> token_stack)  : PRN_tokens(token_stack)
+Condition::Condition(std::string query)
 {
+    PRN_tokens = ArithmParser::arithm_parse(query);
     for (int i = 0; i < PRN_tokens.size(); i++)
     {
         if (PRN_tokens[i]->type != Token::Token_types::String)

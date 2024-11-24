@@ -5,7 +5,7 @@
 class Condition
 {
   public:
-    Condition(std::vector<std::shared_ptr<Token>> token_stack);
+    Condition(std::string query);
     bool apply(const Row &cur_row) const;
 
   private:

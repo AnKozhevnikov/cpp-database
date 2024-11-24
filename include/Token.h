@@ -20,7 +20,7 @@ So, we're gonna have 2 types of parsers
 class Token
 {
   public:
-    enum Token_types
+    enum class Token_types
     {
         Variable,
         String,
@@ -63,9 +63,7 @@ class OpToken : public Token
     OpToken(Token::Token_types v) : Token(v)
     {
     }
-    virtual std::unique_ptr<Cell> apply(const std::vector<std::shared_ptr<Token>> &)
-    {
-    }
+    virtual std::unique_ptr<Cell> apply(const std::vector<std::shared_ptr<Token>> &) = 0;
 };
 
 class VarToken : public Token
@@ -80,7 +78,7 @@ class VarToken : public Token
         }
         else
         {
-            value = associated.v[pos]->clone(); // ToDO what upcast should i make
+            value = associated.v[pos]->clone();
         }
     }
     VarToken(std::unique_ptr<Cell> val) : Token(Token::Token_types::Variable)
@@ -132,7 +130,7 @@ class OpTokenCreator
             return std::make_shared<OrOpToken>();
 
         default:
-            break;
+            throw std::runtime_error("OpTokenCreator: tried to make non-op token");
         }
     }
 };
