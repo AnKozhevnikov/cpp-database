@@ -1,69 +1,69 @@
-#include <DataBase.h>
+#include "Cell.h"
 #include <stdexcept>
 
-std::string DataBase::IntCell::toString() {
+std::string IntCell::toString() {
     return std::to_string(value);
 }
 
-void DataBase::IntCell::inc() {
+void IntCell::inc() {
     ++value;
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::IntCell::clone() {
+std::unique_ptr<Cell> IntCell::clone() {
     return std::make_unique<IntCell>(value);
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::IntCell::opPlus(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opPlus(const std::unique_ptr<Cell> &right) const
 {
     return std::make_unique<IntCell>(value + dynamic_cast<const IntCell &>(*right).value);
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::IntCell::opMinus(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opMinus(const std::unique_ptr<Cell> &right) const
 {
     return std::make_unique<IntCell>(value - dynamic_cast<const IntCell &>(*right).value);
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::IntCell::opMult(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opMult(const std::unique_ptr<Cell> &right) const
 {
     return std::make_unique<IntCell>(value * dynamic_cast<const IntCell &>(*right).value);
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::IntCell::opDiv(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opDiv(const std::unique_ptr<Cell> &right) const
 {
     return std::make_unique<IntCell>(value / dynamic_cast<const IntCell &>(*right).value);
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::IntCell::opMod(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opMod(const std::unique_ptr<Cell> &right) const
 {
     return std::make_unique<IntCell>(value % dynamic_cast<const IntCell &>(*right).value);
 }
 
-bool DataBase::IntCell::opG(const std::unique_ptr<Cell> &right) const
+bool IntCell::opG(const std::unique_ptr<Cell> &right) const
 {
     return value > dynamic_cast<const IntCell &>(*right).value;
 }
 
-bool DataBase::IntCell::opL(const std::unique_ptr<Cell> &right) const
+bool IntCell::opL(const std::unique_ptr<Cell> &right) const
 {
     return value < dynamic_cast<const IntCell &>(*right).value;
 }
 
-bool DataBase::IntCell::opEq(const std::unique_ptr<Cell> &right) const
+bool IntCell::opEq(const std::unique_ptr<Cell> &right) const
 {
     return value == dynamic_cast<const IntCell &>(*right).value;
 }
 
-bool DataBase::IntCell::opGeq(const std::unique_ptr<Cell> &right) const
+bool IntCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
     return value >= dynamic_cast<const IntCell &>(*right).value;
 }
 
-bool DataBase::IntCell::opLeq(const std::unique_ptr<Cell> &right) const
+bool IntCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
     return value <= dynamic_cast<const IntCell &>(*right).value;
 }
 
-bool DataBase::IntCell::opNeq(const std::unique_ptr<Cell> &right) const
+bool IntCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
     return value != dynamic_cast<const IntCell &>(*right).value;
 }

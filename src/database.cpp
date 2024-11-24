@@ -2,8 +2,8 @@
 #include <filesystem>
 #include <set>
 
-DataBase::Table DataBase::createTable(std::string s,
-                                      std::vector<std::tuple<std::string, Types, std::optional<std::any>, int>> info)
+Table DataBase::createTable(std::string s,
+                                      std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> info)
 {
     if (tables.find(s) != tables.end())
     {
@@ -18,7 +18,7 @@ DataBase::Table DataBase::createTable(std::string s,
         std::string columnName = std::get<std::string>(info[i]);
         tables[s].columns[columnName].number = i;
         tables[s].columns[columnName].attr = std::get<int>(info[i]);
-        tables[s].columns[columnName].type = std::get<Types>(info[i]);
+        tables[s].columns[columnName].vtype = std::get<std::shared_ptr<ValueType>>(info[i]);
         tables[s].columns[columnName].baseValue = std::get<std::optional<std::any>>(info[i]);
 
         tables[s].columnOrder[i] = columnName;
@@ -28,7 +28,7 @@ DataBase::Table DataBase::createTable(std::string s,
     return t;
 }
 
-DataBase::Table DataBase::insert(std::string s, std::vector<std::optional<std::any>> row)
+Table DataBase::insert(std::string s, std::vector<std::optional<std::any>> row)
 {
     if (tables.find(s) == tables.end() || tables[s].columns.size() != row.size())
     {
@@ -39,11 +39,11 @@ DataBase::Table DataBase::insert(std::string s, std::vector<std::optional<std::a
     return tables[s].insert(row);
 }
 
-DataBase::Table DataBase::query(std::string str)
+Table DataBase::query(std::string str)
 {
     // placeholder
-    std::tuple<std::string, Types, std::optional<std::any>, int> t = {"inc", Int, 0, AUTOINCREMENT};
-    std::vector<std::tuple<std::string, Types, std::optional<std::any>, int>> v = {t};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t = {"inc", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
+    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t};
     createTable("amogus", v);
 
     insert("amogus", {std::nullopt});

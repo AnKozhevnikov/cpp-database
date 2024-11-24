@@ -1,4 +1,4 @@
-#include <DataBase.h>
+#include "Cell.h"
 
 #include <stdexcept>
 
@@ -7,7 +7,7 @@
 // 2. Different sz == different byte arrays and no leading zeros
 // 3. BigEndian
 
-DataBase::ByteArrayCell::ByteArrayCell(std::string s)
+ByteArrayCell::ByteArrayCell(std::string s)
 {
     for (size_t i = 0; i != s.size(); i++)
     {
@@ -15,7 +15,7 @@ DataBase::ByteArrayCell::ByteArrayCell(std::string s)
     }
 }
 
-std::string DataBase::ByteArrayCell::toString()
+std::string ByteArrayCell::toString()
 {
     std::string ret;
     for (int8_t byte : value)
@@ -25,12 +25,12 @@ std::string DataBase::ByteArrayCell::toString()
     return ret;
 }
 
-std::unique_ptr<DataBase::Cell> DataBase::ByteArrayCell::clone()
+std::unique_ptr<Cell> ByteArrayCell::clone()
 {
     return std::make_unique<ByteArrayCell>(value);
 }
 
-bool DataBase::ByteArrayCell::opEq(const std::unique_ptr<Cell> &right) const
+bool ByteArrayCell::opEq(const std::unique_ptr<Cell> &right) const
 {
     const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
@@ -41,7 +41,7 @@ bool DataBase::ByteArrayCell::opEq(const std::unique_ptr<Cell> &right) const
     return true;
 }
 
-bool DataBase::ByteArrayCell::opG(const std::unique_ptr<Cell> &right) const
+bool ByteArrayCell::opG(const std::unique_ptr<Cell> &right) const
 {
     const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
@@ -52,22 +52,22 @@ bool DataBase::ByteArrayCell::opG(const std::unique_ptr<Cell> &right) const
     return false;
 }
 
-bool DataBase::ByteArrayCell::opL(const std::unique_ptr<Cell> &right) const
+bool ByteArrayCell::opL(const std::unique_ptr<Cell> &right) const
 {
     return !opG(right) && !opEq(right);
 }
 
-bool DataBase::ByteArrayCell::opGeq(const std::unique_ptr<Cell> &right) const
+bool ByteArrayCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
     return opG(right) || opEq(right);
 }
 
-bool DataBase::ByteArrayCell::opLeq(const std::unique_ptr<Cell> &right) const
+bool ByteArrayCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
     return !opG(right);
 }
 
-bool DataBase::ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) const
+bool ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
     return !opEq(right);
 }

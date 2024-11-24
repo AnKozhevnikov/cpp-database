@@ -1,8 +1,12 @@
-#include <DataBase.h>
 #include <fstream>
-#include <experimental/filesystem>
+#include <string>
+#include <sstream>
 
-DataBase::Table DataBase::Table::insert(std::vector<std::optional<std::any>> row)
+#include "DataBase.h"
+#include "Creator.h"
+#include "Table.h"
+
+Table Table::insert(std::vector<std::optional<std::any>> row)
 {
     Row nRow;
     nRow.sz = row.size();
@@ -10,7 +14,7 @@ DataBase::Table DataBase::Table::insert(std::vector<std::optional<std::any>> row
     for (auto it : columns)
     {
         int num = it.second.number;
-        Types t = it.second.type;
+        std::shared_ptr<ValueType> vt = it.second.vtype;
         Creator creator;
         std::unique_ptr<Cell> nCell = nullptr;
         if (!row[num].has_value())
@@ -22,7 +26,7 @@ DataBase::Table DataBase::Table::insert(std::vector<std::optional<std::any>> row
             }
             else if (it.second.baseValue.has_value())
             {
-                nCell = creator.generateCell(t, it.second.baseValue.value());
+                nCell = creator.generateCell(vt, it.second.baseValue.value());
             }
             else
             {
@@ -32,7 +36,7 @@ DataBase::Table DataBase::Table::insert(std::vector<std::optional<std::any>> row
         }
         else
         {
-            nCell = creator.generateCell(t, row[num].value());
+            nCell = creator.generateCell(vt, row[num].value());
         }
 
         nRow.v[num] = std::move(nCell);
@@ -44,7 +48,7 @@ DataBase::Table DataBase::Table::insert(std::vector<std::optional<std::any>> row
     return tab;
 }
 
-void DataBase::Table::save(std::string path)
+void Table::save(std::string path)
 {
     std::string tpath = path + "/" + name + ".csv";
     std::string ipath = path + "/" + name + ".info";
@@ -67,10 +71,10 @@ void DataBase::Table::save(std::string path)
     std::ofstream istream(ipath);
     for (auto it2 : columns)
     {
-        istream << it2.first << "," << it2.second.type << "," << it2.second.attr << "," << it2.second.number;
+        istream << it2.first << "," << it2.second.vtype->toString() << "," << it2.second.attr << "," << it2.second.number;
         if (it2.second.baseValue.has_value())
         {
-            std::unique_ptr<Cell> nCell = Creator().generateCell(it2.second.type, it2.second.baseValue.value());
+            std::unique_ptr<Cell> nCell = Creator().generateCell(it2.second.vtype, it2.second.baseValue.value());
             istream << "," << nCell->toString();
         }
         istream << std::endl;
@@ -78,7 +82,7 @@ void DataBase::Table::save(std::string path)
     istream.close();
 }
 
-void DataBase::Table::load(std::string path)
+void Table::load(std::string path)
 {
     std::string tpath = path + "/" + name + ".csv";
     std::string ipath = path + "/" + name + ".info";
@@ -94,7 +98,7 @@ void DataBase::Table::load(std::string path)
         std::getline(ss, columnName, ',');
 
         std::getline(ss, buf, ',');
-        Types type = static_cast<Types>(std::stoi(buf));
+        std::shared_ptr<ValueType> vtype = Creator().generateValueType(buf);
 
         std::getline(ss, buf, ',');
         int attr = std::stoi(buf);
@@ -106,9 +110,9 @@ void DataBase::Table::load(std::string path)
         std::optional<std::any> baseValue = std::nullopt;
         if (buf != "")
         {
-            baseValue = Creator().generateValue(type, buf);
+            baseValue = Creator().generateValue(vtype, buf);
         }
-        columns[columnName].type = type;
+        columns[columnName].vtype = vtype;
         columns[columnName].attr = attr;
         columns[columnName].number = number;
         columns[columnName].baseValue = baseValue;
@@ -129,7 +133,7 @@ void DataBase::Table::load(std::string path)
             std::string cell;
             std::getline(ss, cell, ',');
             Creator creator;
-            nRow.v[i] = creator.generateCell(columns[columnOrder[i]].type, creator.generateValue(columns[columnOrder[i]].type, cell).value());
+            nRow.v[i] = creator.generateCell(columns[columnOrder[i]].vtype, creator.generateValue(columns[columnOrder[i]].vtype, cell).value());
         }
         rows.emplace_back(std::move(nRow));
     }
