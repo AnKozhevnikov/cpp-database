@@ -1,7 +1,7 @@
 #include "Row.h" 
 #include <string>
 
-int Row::getPos(std::string name)
+int Row::getPos(std::string name) const
 {
     if (columns.find(name) != columns.end())
     {

@@ -73,7 +73,7 @@ class VarToken : public Token
   public:
     VarToken(const Row &associated, std::shared_ptr<StrToken> original) : Token(Token::Token_types::Variable)
     {
-        int pos = associated.get_pos(original->value);
+        int pos = associated.getPos(original->value);
         if (pos == -1)
         {
             value = std::make_unique<Cell>(original->value);
@@ -267,7 +267,7 @@ class NoteqOpToken : public OpToken
         stack.pop_back();
         std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
         stack.pop_back();
-        return var1->opNoteq(var2);
+        return var1->opNeq(var2);
     }
 };
 

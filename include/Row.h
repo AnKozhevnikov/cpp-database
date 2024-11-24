@@ -14,7 +14,7 @@ class Row
   public:
     Row(std::map<std::string, ColumnInfo> &m) : columns(m), sz(0) {}
 
-    int getPos(std::string name);
+    int getPos(std::string name) const;
 
     unsigned int sz;
     std::map<std::string, ColumnInfo> &columns;
