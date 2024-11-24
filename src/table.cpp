@@ -8,7 +8,7 @@
 
 Table Table::insert(std::vector<std::optional<std::any>> row)
 {
-    Row nRow;
+    Row nRow(columns);
     nRow.sz = row.size();
     nRow.v.resize(nRow.sz);
     for (auto it : columns)
@@ -38,6 +38,8 @@ Table Table::insert(std::vector<std::optional<std::any>> row)
         {
             nCell = creator.generateCell(vt, row[num].value());
         }
+
+        
 
         nRow.v[num] = std::move(nCell);
     }
@@ -125,7 +127,7 @@ void Table::load(std::string path)
     while (std::getline(tstream, line))
     {
         std::stringstream ss(line);
-        Row nRow;
+        Row nRow(columns);
         nRow.sz = columns.size();
         nRow.v.resize(nRow.sz);
         for (int i = 0; i < nRow.sz; i++)

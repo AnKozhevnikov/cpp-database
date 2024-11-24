@@ -12,34 +12,34 @@ std::unique_ptr<Cell> StringCell::clone()
     return std::make_unique<StringCell>(value);
 }
 
-bool StringCell::opG(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> StringCell::opG(const std::unique_ptr<Cell> &right) const
 {
-    return value.compare(dynamic_cast<const StringCell &>(*right).value) > 0;
+    return std::make_unique<BoolCell>(value.compare(dynamic_cast<const StringCell &>(*right).value) > 0);
 }
 
-bool StringCell::opL(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> StringCell::opL(const std::unique_ptr<Cell> &right) const
 {
-    return value.compare(dynamic_cast<const StringCell &>(*right).value) < 0;
+    return std::make_unique<BoolCell>(value.compare(dynamic_cast<const StringCell &>(*right).value) < 0);
 }
 
-bool StringCell::opEq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> StringCell::opEq(const std::unique_ptr<Cell> &right) const
 {
-    return value.compare(dynamic_cast<const StringCell &>(*right).value) == 0;
+    return std::make_unique<BoolCell>(value.compare(dynamic_cast<const StringCell &>(*right).value) == 0);
 }
 
-bool StringCell::opGeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> StringCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
-    return opG(right) || opEq(right);
+    return std::make_unique<BoolCell>(opG(right) || opEq(right));
 }
 
-bool StringCell::opLeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> StringCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
-    return opL(right) || opEq(right);
+    return std::make_unique<BoolCell>(opL(right) || opEq(right));
 }
 
-bool StringCell::opNeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> StringCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
-    return !opEq(right);
+    return std::make_unique<BoolCell>(!opEq(right));
 }
 
 std::unique_ptr<Cell> StringCell::opPlus(const std::unique_ptr<Cell> &right) const
@@ -47,7 +47,7 @@ std::unique_ptr<Cell> StringCell::opPlus(const std::unique_ptr<Cell> &right) con
     return std::make_unique<StringCell>(value + dynamic_cast<const StringCell &>(*right).value);
 }
 
-int StringCell::opAbs() const
+std::unique_ptr<Cell> StringCell::opAbs() const
 {
-    return value.length();
+    return std::make_unique<IntCell>(value.length());
 }

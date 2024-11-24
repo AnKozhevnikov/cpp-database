@@ -1,15 +1,23 @@
 #pragma once
 
 #include "Condition.h"
+#include <map>
+#include <string>
+#include <vector>
+#include <memory>
+
+#include "Cell.h"
+#include "ColumnInfo.h"
 
 class Row
 {
   public:
-    Row() = default;
+    Row(std::map<std::string, ColumnInfo> &m) : columns(m), sz(0) {}
 
-    bool fits(Condition cond);
+    int getPos(std::string name);
 
     unsigned int sz;
+    std::map<std::string, ColumnInfo> &columns;
     std::vector<std::unique_ptr<Cell>> v;
 
     Row(const Row &other) = delete;                 // Disable copy constructor

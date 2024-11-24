@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Types.h"
+#include <any>
+#include <optional>
 
 class ColumnInfo
 {
