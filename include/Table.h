@@ -24,11 +24,12 @@ class Table
     Table insert(std::vector<std::optional<std::any>> row);
     void save(std::string path);
     void load(std::string path);
+    std::list<Row> rows;
 
   private:
     std::map<std::string, ColumnInfo> columns;
     std::map<int, std::string> columnOrder;
-    std::list<Row> rows;
+
     std::string name;
 
     bool status;

@@ -42,12 +42,13 @@ Table DataBase::insert(std::string s, std::vector<std::optional<std::any>> row)
 Table DataBase::query(std::string str)
 {
     // placeholder
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t = {"inc", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
-    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t1 = {"c1", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t2 = {"c2", std::make_shared<ValueType>(Int), 0, 0};
+    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t1, t2};
     createTable("amogus", v);
 
-    insert("amogus", {std::nullopt});
-    return insert("amogus", {std::nullopt});
+    insert("amogus", {std::nullopt, std::nullopt});
+    return insert("amogus", {std::nullopt, std::nullopt});
 }
 
 void DataBase::save(std::string path)

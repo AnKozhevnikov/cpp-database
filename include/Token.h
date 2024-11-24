@@ -2,6 +2,7 @@
 
 #include "Cell.h"
 #include "Row.h"
+#include <Creator.h>
 #include <algorithm>
 #include <cctype>
 #include <map>
@@ -47,6 +48,7 @@ class Token
     Token(Token::Token_types val) : type(val)
     {
     }
+    virtual ~Token() = default;
 };
 class StrToken : public Token
 {
@@ -57,15 +59,6 @@ class StrToken : public Token
     std::string value;
 };
 
-class OpToken : public Token
-{
-  public:
-    OpToken(Token::Token_types v) : Token(v)
-    {
-    }
-    virtual std::unique_ptr<Cell> apply(const std::vector<std::shared_ptr<Token>> &) = 0;
-};
-
 class VarToken : public Token
 {
   public:
@@ -74,7 +67,8 @@ class VarToken : public Token
         int pos = associated.getPos(original->value);
         if (pos == -1)
         {
-            value = std::make_unique<Cell>(original->value);
+            // value = std::make_unique<Cell>(original->value);
+            // value = Creator::
         }
         else
         {
@@ -86,6 +80,291 @@ class VarToken : public Token
         value = val->clone();
     }
     std::unique_ptr<Cell> value;
+};
+
+class OpToken : public Token
+{
+  public:
+    OpToken(Token::Token_types v) : Token(v)
+    {
+    }
+    virtual std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &)
+    {
+        throw std::runtime_error("OpToken: apply is not implemented");
+    };
+};
+
+class NotOpToken : public OpToken
+{
+  public:
+    NotOpToken() : OpToken(Token::Token_types::Op_not)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var->opNot();
+    }
+};
+
+class MulOpToken : public OpToken
+{
+  public:
+    MulOpToken() : OpToken(Token::Token_types::Op_mul)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opMult(var2);
+    }
+};
+class DivOpToken : public OpToken
+{
+  public:
+    DivOpToken() : OpToken(Token::Token_types::Op_div)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opDiv(var2);
+    }
+};
+class ModOpToken : public OpToken
+{
+  public:
+    ModOpToken() : OpToken(Token::Token_types::Op_mod)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opMod(var2);
+    }
+};
+class PlusOpToken : public OpToken
+{
+  public:
+    PlusOpToken() : OpToken(Token::Token_types::Op_plus)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opPlus(var2);
+    }
+};
+class MinusOpToken : public OpToken
+{
+  public:
+    MinusOpToken() : OpToken(Token::Token_types::Op_minus)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opMinus(var2);
+    }
+};
+class AbsOpToken : public OpToken
+{
+  public:
+    AbsOpToken() : OpToken(Token::Token_types::Op_abs)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opAbs();
+    }
+};
+class EqOpToken : public OpToken
+{
+  public:
+    EqOpToken() : OpToken(Token::Token_types::Op_eq)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opEq(var2);
+    }
+};
+
+class NoteqOpToken : public OpToken
+{
+  public:
+    NoteqOpToken() : OpToken(Token::Token_types::Op_noteq)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opNeq(var2);
+    }
+};
+
+class LOpToken : public OpToken
+{
+  public:
+    LOpToken() : OpToken(Token::Token_types::Op_l)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opL(var2);
+    }
+};
+class LeqOpToken : public OpToken
+{
+  public:
+    LeqOpToken() : OpToken(Token::Token_types::Op_leq)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opLeq(var2);
+    }
+};
+class GOpToken : public OpToken
+{
+  public:
+    GOpToken() : OpToken(Token::Token_types::Op_g)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opG(var2);
+    }
+};
+
+class GeqOpToken : public OpToken
+{
+  public:
+    GeqOpToken() : OpToken(Token::Token_types::Op_geq)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opGeq(var2);
+    }
+};
+class AndOpToken : public OpToken
+{
+  public:
+    AndOpToken() : OpToken(Token::Token_types::Op_and)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opAnd(var2);
+    }
+};
+class XorOpToken : public OpToken
+{
+  public:
+    XorOpToken() : OpToken(Token::Token_types::Op_xor)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opXor(var2);
+    }
+};
+class OrOpToken : public OpToken
+{
+  public:
+    OrOpToken() : OpToken(Token::Token_types::Op_or)
+    {
+    }
+    // TODO: is it correct
+    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
+    {
+        stack.pop_back();
+        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
+        stack.pop_back();
+        return var1->opOr(var2);
+    }
 };
 
 class OpTokenCreator
@@ -132,246 +411,5 @@ class OpTokenCreator
         default:
             throw std::runtime_error("OpTokenCreator: tried to make non-op token");
         }
-    }
-};
-
-class NotOpToken : public OpToken
-{
-    NotOpToken() : OpToken(Token::Token_types::Op_not)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var->opNot();
-    }
-};
-
-class MulOpToken : public OpToken
-{
-    MulOpToken() : OpToken(Token::Token_types::Op_mul)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opMult(var2);
-    }
-};
-class DivOpToken : public OpToken
-{
-    DivOpToken() : OpToken(Token::Token_types::Op_div)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opDiv(var2);
-    }
-};
-class ModOpToken : public OpToken
-{
-    ModOpToken() : OpToken(Token::Token_types::Op_mod)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opMod(var2);
-    }
-};
-class PlusOpToken : public OpToken
-{
-    PlusOpToken() : OpToken(Token::Token_types::Op_plus)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opPlus(var2);
-    }
-};
-class MinusOpToken : public OpToken
-{
-    MinusOpToken() : OpToken(Token::Token_types::Op_minus)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opMinus(var2);
-    }
-};
-class AbsOpToken : public OpToken
-{
-    AbsOpToken() : OpToken(Token::Token_types::Op_abs)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opAbs();
-    }
-};
-class EqOpToken : public OpToken
-{
-    EqOpToken() : OpToken(Token::Token_types::Op_eq)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opEq(var2);
-    }
-};
-
-class NoteqOpToken : public OpToken
-{
-    NoteqOpToken() : OpToken(Token::Token_types::Op_noteq)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opNeq(var2);
-    }
-};
-
-class LOpToken : public OpToken
-{
-    LOpToken() : OpToken(Token::Token_types::Op_l)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opL(var2);
-    }
-};
-class LeqOpToken : public OpToken
-{
-    LeqOpToken() : OpToken(Token::Token_types::Op_leq)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opLeq(var2);
-    }
-};
-class GOpToken : public OpToken
-{
-    GOpToken() : OpToken(Token::Token_types::Op_g)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opG(var2);
-    }
-};
-
-class GeqOpToken : public OpToken
-{
-    GeqOpToken() : OpToken(Token::Token_types::Op_geq)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opGeq(var2);
-    }
-};
-class AndOpToken : public OpToken
-{
-    AndOpToken() : OpToken(Token::Token_types::Op_and)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opAnd(var2);
-    }
-};
-class XorOpToken : public OpToken
-{
-    XorOpToken() : OpToken(Token::Token_types::Op_xor)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opXor(var2);
-    }
-};
-class OrOpToken : public OpToken
-{
-    OrOpToken() : OpToken(Token::Token_types::Op_or)
-    {
-    }
-    // TODO: is it correct
-    std::unique_ptr<Cell> apply(std::vector<std::shared_ptr<Token>> &stack)
-    {
-        std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        std::unique_ptr<Cell> var2 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
-        stack.pop_back();
-        return var1->opOr(var2);
     }
 };

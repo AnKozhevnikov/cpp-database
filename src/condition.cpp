@@ -24,12 +24,12 @@ bool Condition::apply(const Row &cur_row) const
     {
         if (cur_stack[i]->type == Token::Token_types::String)
         {
-            cur_stack[i] == std::make_shared<VarToken>(cur_row, cur_stack[i]);
+            cur_stack[i] = std::make_shared<VarToken>(cur_row, std::dynamic_pointer_cast<StrToken>(cur_stack[i]));
         }
     }
     while (cur_stack.size() != 1 && cur_stack.back()->type != Token::Token_types::Variable)
     {
-        cur_stack.emplace_back(std::dynamic_pointer_cast<OpToken>(cur_stack.back())->apply(cur_stack));
+        cur_stack.push_back(std::make_shared<VarToken>(std::dynamic_pointer_cast<OpToken>(cur_stack.back())->apply(cur_stack)));
     }
     if (cur_stack.size() != 1)
     {

@@ -7,7 +7,7 @@ static std::map<Token::Token_types, int> operations_precedence = {
     {Token::Token_types::Op_leq, 3}, {Token::Token_types::Op_g, 3},     {Token::Token_types::Op_geq, 3},
     {Token::Token_types::Op_and, 4}, {Token::Token_types::Op_xor, 5},   {Token::Token_types::Op_or, 6}};
 
-static std::map<ArithmParser::Order_type, std::string> order_to_string = {
+static std::map<ArithmParser::Order_type, std::string> order_to_string = {{ArithmParser::Order_type::Op_not, "!"},
     {ArithmParser::Order_type::Op_mul, "*"},    {ArithmParser::Order_type::Op_div, "//"},
     {ArithmParser::Order_type::Op_mod, "%"},    {ArithmParser::Order_type::Op_plus, "+"},
     {ArithmParser::Order_type::Op_minus, "-"},  {ArithmParser::Order_type::Op_eq, "="},
@@ -25,9 +25,9 @@ void ArithmParser::rec_parse(const std::string &str, ArithmParser::Order_type cu
     int next = left;
     switch (cur_token)
     {
-    case ArithmParser::Order_type::Quote:
+    case ArithmParser::Order_type::Quote: {
         int opened = 0;
-        next = (str.find("\""), left);
+        next = str.find("\"", left);
         while (next <= right && next != std::string::npos)
         {
             if (opened == 0)
@@ -36,20 +36,20 @@ void ArithmParser::rec_parse(const std::string &str, ArithmParser::Order_type cu
             }
             else
             {
-                ans.push_back(std::make_shared<StrToken>(str.substr(cur_start - 1, next - cur_start + 2),
-                                                         Token::Token_types::String));
+                ans.push_back(std::make_shared<StrToken>(str.substr(cur_start - 1, next - cur_start + 2)));
             }
             opened ^= 1;
             cur_start = next + 1;
-            next = (str.find("\""), cur_start);
+            next = str.find("\"", cur_start);
         }
         if (opened == 1)
         {
             throw std::runtime_error("Arithm_parser:: No matching \" was found");
         }
         break;
-    case ArithmParser::Order_type::Par:
-        next = (str.find("("), left);
+    }
+    case ArithmParser::Order_type::Par: {
+        next = str.find("(", left);
         while (next <= right && next != std::string::npos)
         {
             rec_parse(str, static_cast<ArithmParser::Order_type>(cur_token + 1), cur_start, next - 1, ans);
@@ -82,12 +82,13 @@ void ArithmParser::rec_parse(const std::string &str, ArithmParser::Order_type cu
             rec_parse(str, static_cast<ArithmParser::Order_type>(cur_token), cur_start, next - 1, ans);
             ans.push_back(std::make_shared<OpToken>(Token::Token_types::Par_right));
             cur_start = next + 1;
-            next = (str.find("("), cur_start);
+            next = str.find("(", cur_start);
         }
         break;
-    case ArithmParser::Order_type::Op_abs:
+    }
+    case ArithmParser::Order_type::Op_abs: {
         int opened = 0;
-        next = (str.find("|"), left);
+        next = str.find("|", left);
         while (next <= right && next != std::string::npos)
         {
             if (opened == 0)
@@ -103,30 +104,36 @@ void ArithmParser::rec_parse(const std::string &str, ArithmParser::Order_type cu
             }
             opened ^= 1;
             cur_start = next + 1;
-            next = (str.find("|"), cur_start);
+            next = str.find("|", cur_start);
         }
         if (opened == 1)
         {
             throw std::runtime_error("Arithm_parser:: No matching | was found");
         }
         break;
-    case ArithmParser::Order_type::Var:
+    }
+    case ArithmParser::Order_type::Var: {
         while (std::isspace(static_cast<unsigned char>(str[left])))
             left++;
         while (std::isspace(static_cast<unsigned char>(str[right])))
             right--;
-        ans.push_back(std::make_shared<StrToken>(str.substr(left, right - left + 1), Token::Token_types::String));
-        break;
-    default:
-        next = (order_to_string[cur_token], left);
+        ans.push_back(std::make_shared<StrToken>(str.substr(left, right - left + 1)));
+        return;
+    }
+    default: {
+        next = str.find(order_to_string[cur_token], left);
+        auto p = order_to_string[cur_token];
         while (next <= right && next != std::string::npos)
         {
             rec_parse(str, static_cast<ArithmParser::Order_type>(cur_token + 1), cur_start, next - 1, ans);
+            ans.push_back(std::make_shared<OpToken>(static_cast<Token::Token_types>(cur_token + static_cast<int>(Token::Token_types::Op_not) - 2)));
             cur_start = next + 1;
-            next = (order_to_string[cur_token], cur_start);
+            next = str.find(order_to_string[cur_token], cur_start);
         }
         break;
     }
+    }
+    rec_parse(str, static_cast<ArithmParser::Order_type>(cur_token + 1), cur_start, right, ans);
 }
 std::vector<std::shared_ptr<Token>> ArithmParser::arithm_parse(std::string origin_str)
 {
@@ -163,8 +170,13 @@ std::vector<std::shared_ptr<Token>> ArithmParser::arithm_parse(std::string origi
         }
         else
         {
-            op_stack.emplace_back(cur_token);
+            output.emplace_back(cur_token);
         }
+    }
+    while (!op_stack.empty())
+    {
+        output.emplace_back(op_stack.back());
+        op_stack.pop_back();
     }
     return output;
 }

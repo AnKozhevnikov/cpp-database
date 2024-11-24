@@ -1,7 +1,9 @@
 #pragma once
-#include "ArithmParcer.h"
+
 #include "Row.h"
+#include "ArithmParcer.h"
 #include "Token.h"
+
 class Condition
 {
   public:
