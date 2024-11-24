@@ -20,17 +20,17 @@ class Cell
     virtual std::unique_ptr<Cell> opMult(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opDiv(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opMod(const std::unique_ptr<Cell> &right) const;
-    virtual bool opG(const std::unique_ptr<Cell> &right) const;
-    virtual bool opL(const std::unique_ptr<Cell> &right) const;
-    virtual bool opEq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opGeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opLeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opG(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opL(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opEq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opGeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opAnd(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opOr(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNot() const;
     virtual std::unique_ptr<Cell> opXor(const std::unique_ptr<Cell> &right) const;
-    virtual int opAbs() const;
+    virtual std::unique_ptr<Cell> opAbs() const;
 };
 
 class IntCell : public Cell
@@ -51,12 +51,12 @@ class IntCell : public Cell
     virtual std::unique_ptr<Cell> opMult(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opDiv(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opMod(const std::unique_ptr<Cell> &right) const;
-    virtual bool opG(const std::unique_ptr<Cell> &right) const;
-    virtual bool opL(const std::unique_ptr<Cell> &right) const;
-    virtual bool opEq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opGeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opLeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opG(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opL(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opEq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opGeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
     int value;
 };
 
@@ -72,12 +72,12 @@ class BoolCell : public Cell
     BoolCell(bool v) : value(v)
     {
     }
-    virtual bool opG(const std::unique_ptr<Cell> &right) const;
-    virtual bool opL(const std::unique_ptr<Cell> &right) const;
-    virtual bool opEq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opGeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opLeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opG(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opL(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opEq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opGeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opOr(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opAnd(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNot() const;
@@ -94,13 +94,13 @@ class StringCell : public Cell
     {
     }
     virtual std::unique_ptr<Cell> opPlus(const std::unique_ptr<Cell> &right) const;
-    virtual bool opG(const std::unique_ptr<Cell> &right) const;
-    virtual bool opL(const std::unique_ptr<Cell> &right) const;
-    virtual bool opEq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opGeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opLeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
-    virtual int opAbs() const;
+    virtual std::unique_ptr<Cell> opG(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opL(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opEq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opGeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opAbs() const;
     std::string value;
 };
 
@@ -114,11 +114,11 @@ class ByteArrayCell : public Cell
     ByteArrayCell(std::vector<int8_t> v) : value(v)
     {
     }
-    virtual bool opG(const std::unique_ptr<Cell> &right) const;
-    virtual bool opL(const std::unique_ptr<Cell> &right) const;
-    virtual bool opEq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opGeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opLeq(const std::unique_ptr<Cell> &right) const;
-    virtual bool opNeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opG(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opL(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opEq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opGeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
     std::vector<int8_t> value;
 };

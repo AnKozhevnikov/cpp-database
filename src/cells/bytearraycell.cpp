@@ -30,44 +30,44 @@ std::unique_ptr<Cell> ByteArrayCell::clone()
     return std::make_unique<ByteArrayCell>(value);
 }
 
-bool ByteArrayCell::opEq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> ByteArrayCell::opEq(const std::unique_ptr<Cell> &right) const
 {
     const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])
-            return false;
+            return std::make_unique<BoolCell>(false);
     }
-    return true;
+    return std::make_unique<BoolCell>(true);
 }
 
-bool ByteArrayCell::opG(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> ByteArrayCell::opG(const std::unique_ptr<Cell> &right) const
 {
     const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])
-            return value[i] > right_value[i];
+            return std::make_unique<BoolCell>(value[i] > right_value[i]);
     }
-    return false;
+    return std::make_unique<BoolCell>(false);
 }
 
-bool ByteArrayCell::opL(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> ByteArrayCell::opL(const std::unique_ptr<Cell> &right) const
 {
-    return !opG(right) && !opEq(right);
+    return std::make_unique<BoolCell>(!opG(right) && !opEq(right));
 }
 
-bool ByteArrayCell::opGeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> ByteArrayCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
-    return opG(right) || opEq(right);
+    return std::make_unique<BoolCell>(opG(right) || opEq(right));
 }
 
-bool ByteArrayCell::opLeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> ByteArrayCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
-    return !opG(right);
+    return std::make_unique<BoolCell>(!opG(right));
 }
 
-bool ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
-    return !opEq(right);
+    return std::make_unique<BoolCell>(!opEq(right));
 }

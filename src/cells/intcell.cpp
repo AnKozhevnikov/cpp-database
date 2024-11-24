@@ -38,34 +38,34 @@ std::unique_ptr<Cell> IntCell::opMod(const std::unique_ptr<Cell> &right) const
     return std::make_unique<IntCell>(value % dynamic_cast<const IntCell &>(*right).value);
 }
 
-bool IntCell::opG(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opG(const std::unique_ptr<Cell> &right) const
 {
-    return value > dynamic_cast<const IntCell &>(*right).value;
+    return std::make_unique<BoolCell>(value > dynamic_cast<const IntCell &>(*right).value);
 }
 
-bool IntCell::opL(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opL(const std::unique_ptr<Cell> &right) const
 {
-    return value < dynamic_cast<const IntCell &>(*right).value;
+    return std::make_unique<BoolCell>(value < dynamic_cast<const IntCell &>(*right).value);
 }
 
-bool IntCell::opEq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opEq(const std::unique_ptr<Cell> &right) const
 {
-    return value == dynamic_cast<const IntCell &>(*right).value;
+    return std::make_unique<BoolCell>(value == dynamic_cast<const IntCell &>(*right).value);
 }
 
-bool IntCell::opGeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
-    return value >= dynamic_cast<const IntCell &>(*right).value;
+    return std::make_unique<BoolCell>(value >= dynamic_cast<const IntCell &>(*right).value);
 }
 
-bool IntCell::opLeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
-    return value <= dynamic_cast<const IntCell &>(*right).value;
+    return std::make_unique<BoolCell>(value <= dynamic_cast<const IntCell &>(*right).value);
 }
 
-bool IntCell::opNeq(const std::unique_ptr<Cell> &right) const
+std::unique_ptr<Cell> IntCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
-    return value != dynamic_cast<const IntCell &>(*right).value;
+    return std::make_unique<BoolCell>(value != dynamic_cast<const IntCell &>(*right).value);
 }
 
 
