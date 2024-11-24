@@ -1,12 +1,12 @@
 #pragma once
 
+#include <list>
 #include <map>
 #include <string>
-#include <list>
 #include <vector>
 
-#include "Row.h"
 #include "ColumnInfo.h"
+#include "Row.h"
 
 class Table
 {
@@ -21,6 +21,10 @@ class Table
         return status;
     }
 
+    Table insert(std::vector<std::optional<std::any>> row);
+    void save(std::string path);
+    void load(std::string path);
+
   private:
     std::map<std::string, ColumnInfo> columns;
     std::map<int, std::string> columnOrder;
@@ -28,11 +32,6 @@ class Table
     std::string name;
 
     bool status;
-
-    Table insert(std::vector<std::optional<std::any>> row);
-
-    void save(std::string path);
-    void load(std::string path);
 
     friend class DataBase;
 };
