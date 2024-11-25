@@ -1,15 +1,12 @@
 #pragma once
 
-#include "Row.h"
-#include "ArithmParcer.h"
-#include "Token.h"
+#include "PRNCompiler.h"
 
-class Condition
+class Condition : public PRN_complier
 {
   public:
-    Condition(std::string query);
-    bool apply(const Row &cur_row) const;
-
-  private:
-    std::vector<std::shared_ptr<Token>> PRN_tokens;
+    Condition(std::string query) : PRN_complier(query)
+    {
+    }
+    bool apply(const Row &cur_row);
 };
