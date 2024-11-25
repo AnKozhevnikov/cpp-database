@@ -1,6 +1,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "DataBase.h"
 #include "Creator.h"
@@ -73,8 +74,7 @@ void Table::save(std::string path)
     std::ofstream istream(ipath);
     for (auto it2 : columns)
     {
-        istream << it2.first << separator << it2.second.vtype->toString() << separator << it2.second.attr << separator << it2.second.number;
-        if (it2.second.baseValue.has_value())
+        istream << it2.first << separator << Creator::stringFromValueType(it2.second.vtype) << separator << it2.second.attr << separator << it2.second.number;
         {
             std::unique_ptr<Cell> nCell = Creator().generateCell(it2.second.vtype, it2.second.baseValue.value());
             istream << separator << nCell->toString();

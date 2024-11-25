@@ -62,19 +62,19 @@ std::shared_ptr<ValueType> Creator::generateValueType(std::string s)
         s = s.substr(0, i);
     }
 
-    if (s == std::to_string(Int))
+    if (s == "int")
     {
         return std::make_shared<ValueType>(Int);
     }
-    else if (s == std::to_string(Bool))
+    else if (s == "bool")
     {
         return std::make_shared<ValueType>(Bool);
     }
-    else if (s == std::to_string(String))
+    else if (s == "string")
     {
         return std::make_shared<ValueType>(String);
     }
-    else if (s == std::to_string(ByteArray))
+    else if (s == "bytearray")
     {
         return std::make_shared<ByteArrayType>(std::stoi(args));
     }
@@ -102,5 +102,22 @@ std::unique_ptr<Cell> Creator::cellFromRawString(std::string s)
         }
         
         throw std::invalid_argument("Unknown type");
+    }
+}
+
+std::string Creator::stringFromValueType(std::shared_ptr<ValueType> vtype)
+{
+    switch (vtype->type)
+    {
+    case Int:
+        return "int";
+    case Bool:
+        return "bool";
+    case String:
+        return "string";
+    case ByteArray:
+        return "bytearray[" + std::to_string(std::dynamic_pointer_cast<ByteArrayType>(vtype)->size) + "]";
+    default:
+        throw std::invalid_argument("Invalid type");
     }
 }

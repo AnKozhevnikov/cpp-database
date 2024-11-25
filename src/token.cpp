@@ -12,10 +12,7 @@ VarToken::VarToken(const Row &associated, std::shared_ptr<StrToken> original) : 
     int pos = associated.getPos(original->value);
     if (pos == -1)
     {
-        throw std::runtime_error("VarToken: Creation from constant doesnt implemented");
-        // TODO : make this
-        //  value = std::make_unique<Cell>(original->value);
-        //  value = Creator::
+        value = Creator::cellFromRawString(original->value);
     }
     else
     {
