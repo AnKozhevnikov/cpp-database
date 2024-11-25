@@ -67,8 +67,7 @@ class VarToken : public Token
         int pos = associated.getPos(original->value);
         if (pos == -1)
         {
-            // value = std::make_unique<Cell>(original->value);
-            // value = Creator::
+            value = Creator::cellFromRawString(original->value);
         }
         else
         {

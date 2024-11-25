@@ -4,7 +4,7 @@
 
 std::string StringCell::toString()
 {
-    return value;
+    return '"' + value + '"';
 }
 
 std::unique_ptr<Cell> StringCell::clone()

@@ -1,7 +1,7 @@
 #include <stdexcept>
 
-#include "Creator.h"
 #include "Cell.h"
+#include "Creator.h"
 #include "DataBase.h"
 
 std::unique_ptr<Cell> Creator::generateCell(std::shared_ptr<ValueType> vtype, std::any arg)
@@ -28,8 +28,12 @@ std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype,
     case Int:
         return std::stoi(s);
     case Bool:
-        return s == "1";
+        return s == "1" || s == "True";
     case String:
+        if (s[0] == '"' && s.back() == '"')
+        {
+            return s.substr(1, s.size() - 2);
+        }
         return s;
     case ByteArray: {
         std::vector<int8_t> v;
@@ -77,5 +81,26 @@ std::shared_ptr<ValueType> Creator::generateValueType(std::string s)
     else
     {
         throw std::invalid_argument("Invalid type");
+    }
+}
+
+std::unique_ptr<Cell> Creator::cellFromRawString(std::string s)
+{
+    if (s[0] == '(')
+    {
+        std::string type = s.substr(1, s.find(')') - 1);
+        std::string value = s.substr(s.find(')') + 1);
+        std::shared_ptr<ValueType> vtype = generateValueType(type);
+        std::optional<std::any> val = generateValue(vtype, value);
+        return generateCell(vtype, val.value());
+    }
+    else
+    {
+        if (s == "True" || s == "False")
+        {
+            return std::make_unique<BoolCell>(s == "True");
+        }
+        
+        throw std::invalid_argument("Unknown type");
     }
 }

@@ -23,8 +23,6 @@ class DataBase
     Table createTable(std::string s, std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> info);
     Table insert(std::string s, std::vector<std::optional<std::any>> row);
 
-    
-
   public:
     std::map<std::string, Table> tables;
     Table query(std::string q);

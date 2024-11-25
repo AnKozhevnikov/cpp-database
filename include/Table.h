@@ -34,5 +34,7 @@ class Table
 
     bool status;
 
+    const char separator = '\t';
+
     friend class DataBase;
 };

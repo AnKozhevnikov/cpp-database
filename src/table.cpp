@@ -63,7 +63,7 @@ void Table::save(std::string path)
             tstream << it1.v[i]->toString();
             if (i != it1.v.size() - 1)
             {
-                tstream << ",";
+                tstream << separator;
             }
         }
         tstream << "\n";
@@ -73,11 +73,11 @@ void Table::save(std::string path)
     std::ofstream istream(ipath);
     for (auto it2 : columns)
     {
-        istream << it2.first << "," << it2.second.vtype->toString() << "," << it2.second.attr << "," << it2.second.number;
+        istream << it2.first << separator << it2.second.vtype->toString() << separator << it2.second.attr << separator << it2.second.number;
         if (it2.second.baseValue.has_value())
         {
             std::unique_ptr<Cell> nCell = Creator().generateCell(it2.second.vtype, it2.second.baseValue.value());
-            istream << "," << nCell->toString();
+            istream << separator << nCell->toString();
         }
         istream << std::endl;
     }
@@ -97,18 +97,18 @@ void Table::load(std::string path)
         std::string buf;
         std::string columnName;
 
-        std::getline(ss, columnName, ',');
+        std::getline(ss, columnName, separator);
 
-        std::getline(ss, buf, ',');
+        std::getline(ss, buf, separator);
         std::shared_ptr<ValueType> vtype = Creator().generateValueType(buf);
 
-        std::getline(ss, buf, ',');
+        std::getline(ss, buf, separator);
         int attr = std::stoi(buf);
 
-        std::getline(ss, buf, ',');
+        std::getline(ss, buf, separator);
         int number = std::stoi(buf);
 
-        std::getline(ss, buf, ',');
+        std::getline(ss, buf, separator);
         std::optional<std::any> baseValue = std::nullopt;
         if (buf != "")
         {
@@ -133,7 +133,7 @@ void Table::load(std::string path)
         for (int i = 0; i < nRow.sz; i++)
         {
             std::string cell;
-            std::getline(ss, cell, ',');
+            std::getline(ss, cell, separator);
             Creator creator;
             nRow.v[i] = creator.generateCell(columns[columnOrder[i]].vtype, creator.generateValue(columns[columnOrder[i]].vtype, cell).value());
         }
