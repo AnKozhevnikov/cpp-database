@@ -114,7 +114,7 @@ std::unique_ptr<Cell> NoteqOpToken::apply(std::vector<std::shared_ptr<Token>> &s
     return var1->opNeq(var2);
 }
 
-std::unique_ptr<Cell> LOpTokenapply(std::vector<std::shared_ptr<Token>> &stack)
+std::unique_ptr<Cell> LOpToken::apply(std::vector<std::shared_ptr<Token>> &stack)
 {
     stack.pop_back();
     std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
@@ -134,7 +134,7 @@ std::unique_ptr<Cell> LeqOpToken::apply(std::vector<std::shared_ptr<Token>> &sta
     return var1->opLeq(var2);
 }
 
-std::unique_ptr<Cell> GOpTokenapply(std::vector<std::shared_ptr<Token>> &stack)
+std::unique_ptr<Cell> GOpToken::apply(std::vector<std::shared_ptr<Token>> &stack)
 {
     stack.pop_back();
     std::unique_ptr<Cell> var1 = std::dynamic_pointer_cast<VarToken>(stack.back())->value->clone();
