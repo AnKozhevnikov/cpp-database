@@ -5,8 +5,10 @@ static std::string strip(std::string str)
 {
     int left = 0;
     int right = str.size() - 1;
-    while (std::isspace(static_cast<unsigned char>(str[left])))
+    while (std::isspace(static_cast<unsigned char>(str[left])) && left < str.size())
         left++;
+    if (left == str.size())
+        return std::string("");
     while (std::isspace(static_cast<unsigned char>(str[right])))
         right--;
     return str.substr(left, right - left + 1);
@@ -31,11 +33,11 @@ static std::string get_space_word(std::string str, int &start)
     return "";
 }
 
-static int unquote_find(std::string origin_str, std::string to_find)
+static int unquote_find(std::string origin_str, std::string to_find, int start = 0)
 {
     int first = 0;
     int second = origin_str.find(to_find);
-
+    origin_str = origin_str.substr(start);
     for (; first != std::string::npos;
          first = origin_str.find(to_find, second + 1), second = origin_str.find(to_find, first + 1))
     {
@@ -78,10 +80,43 @@ Table DataBase::exucute(std::string query)
     }
     else if (type_query == "insert")
     {
-        /*
-        auto res = InsertQuery::parse(query.substr(pos));
-        return insert(res.first, res.second);
-        */
+        int to_pos = query.find("to", query.rfind(')'));
+        if (to_pos == -1)
+            throw std::runtime_error("FuncParser:: no to in insert found");
+        int prev = 0;
+        std::vector<std::string> values;
+        int next = unquote_find(query, std::string(","), prev);
+            while (next != std::string::npos)
+            {
+                values.emplace_back(strip(query.substr(prev, next - prev)));
+                prev = next + 1;
+                next = unquote_find(query, std::string(","), prev);
+            }
+            values.emplace_back(strip(query.substr(prev, query.rfind(')') - prev)));
+            
+        if (unquote_find(query, std::string("="), prev) != -1)
+        {
+            std::map<std::string, std::string> map_values;
+            for (std::string&  i : values)
+            {
+                int sep = unquote_find(i, std::string("="));
+                map_values.insert({strip (i.substr(0, sep)), strip(i.substr(sep + 1))});
+            }
+
+        }
+        else
+        {
+            std::vector<std::optional<std::string>> tmp(values.size());
+            for (int i = 0; i < values.size(); i++)
+            {
+                if (values[i] == std::string(""))
+                    tmp[i] = std::nullopt;
+                else
+                    tmp[i] = values[i];
+            }
+            return insertArr(strip(query.substr(to_pos + 2)), tmp);
+        }
+
     }
     else if (type_query == "delete")
     {
@@ -102,7 +137,8 @@ Table DataBase::exucute(std::string query)
             throw std::runtime_error("FuncParser:: no set in update found");
         if (where_pos == -1)
             return update(strip(query.substr(0, set_pos)), query.substr(set_pos + 3), "");
-        return update(strip(query.substr(0, set_pos)), query.substr(set_pos + 3, where_pos - set_pos - 2), query.substr(where_pos + 5));
+        return update(strip(query.substr(0, set_pos)), query.substr(set_pos + 3, where_pos - set_pos - 2),
+                      query.substr(where_pos + 5));
     }
     else if (type_query == "select")
     {
@@ -113,13 +149,14 @@ Table DataBase::exucute(std::string query)
         if (from_pos == -1)
             throw std::runtime_error("FuncParser:: no from in select  found");
         int prev = 0;
-        int next = query.find(',', prev);
-        while (next != std::string::npos && next < from_pos )
+        int next = unquote_find(query, std::string(","), prev);
+        while (next != std::string::npos && next < from_pos)
         {
             columns.emplace_back(strip(query.substr(prev, next - prev)));
             prev = next + 1;
-            next = query.find(',', prev);
+            next = unquote_find(query, std::string(","), prev);
         }
+        columns.emplace_back(strip(query.substr(prev, where_pos - prev)));
         if (where_pos == -1)
         {
             return select(strip(query.substr(from_pos + 4, where_pos - from_pos - 4)), columns, tmp);
