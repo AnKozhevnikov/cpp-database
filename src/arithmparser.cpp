@@ -1,5 +1,7 @@
 #include <ArithmParcer.h>
 
+#include <stdexcept>
+
 static std::map<Token::Token_types, int> operations_precedence = {
     {Token::Token_types::Op_not, 0}, {Token::Token_types::Op_mul, 1},   {Token::Token_types::Op_div, 1},
     {Token::Token_types::Op_mod, 1}, {Token::Token_types::Op_plus, 2},  {Token::Token_types::Op_minus, 2},

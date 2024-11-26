@@ -39,18 +39,6 @@ Table DataBase::insert(std::string s, std::vector<std::optional<std::any>> row)
     return tables[s].insert(row);
 }
 
-Table DataBase::query(std::string str)
-{
-    // placeholder
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t1 = {"c1", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t2 = {"c2", std::make_shared<ValueType>(Int), 0, 0};
-    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t1, t2};
-    createTable("amogus", v);
-
-    insert("amogus", {std::nullopt, std::nullopt});
-    return insert("amogus", {std::nullopt, std::nullopt});
-}
-
 void DataBase::save(std::string path)
 {
     std::error_code ec;
@@ -68,16 +56,16 @@ void DataBase::save(std::string path)
 
 void DataBase::load(std::string path)
 {
-    std::set<std::string> csvs;
+    std::set<std::string> tsvs;
     std::set<std::string> infos;
 
     for (const auto &dirEntry : std::filesystem::directory_iterator(path))
     {
         std::string f = dirEntry.path().string();
         std::string name = f.substr(f.find_last_of('/') + 1);
-        if (name.find(".csv") != std::string::npos)
+        if (name.find(".tsv") != std::string::npos)
         {
-            csvs.insert(name.substr(0, name.find(".csv")));
+            tsvs.insert(name.substr(0, name.find(".tsv")));
         }
         else if (name.find(".info") != std::string::npos)
         {
@@ -85,7 +73,7 @@ void DataBase::load(std::string path)
         }
     }
 
-    for (const auto &it : csvs)
+    for (const auto &it : tsvs)
     {
         if (infos.find(it) == infos.end())
         {
@@ -95,12 +83,61 @@ void DataBase::load(std::string path)
 
     for (const auto &it : infos)
     {
-        if (csvs.find(it) == csvs.end())
+        if (tsvs.find(it) == tsvs.end())
         {
-            throw std::runtime_error("No csv file for table " + it);
+            throw std::runtime_error("No tsv file for table " + it);
         }
         tables[it].status = true;
         tables[it].name = it;
         tables[it].load(path);
     }
+}
+
+Table DataBase::select(std::string s, std::vector<std::string> columns, Condition &cond)
+{
+    if (tables.find(s) == tables.end())
+    {
+        Table t(false);
+        return t;
+    }
+
+    return tables[s].select(columns, cond);
+}
+
+Table DataBase::deleteRows(std::string s, Condition &cond)
+{
+    if (tables.find(s) == tables.end())
+    {
+        Table t(false);
+        return t;
+    }
+
+    return tables[s].deleteRows(cond);
+}
+
+Table DataBase::update(std::string s, std::string allexpr, std::string cond)
+{
+    if (tables.find(s) == tables.end())
+    {
+        Table t(false);
+        return t;
+    }
+
+    return tables[s].update(allexpr, cond);
+}
+
+Table DataBase::query(std::string str)
+{
+    // placeholder
+    /*std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t1 = {"c1", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t2 = {"c2", std::make_shared<ValueType>(Int), 0, 0};
+    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t1, t2};
+    createTable("amogus", v);
+
+    insert("amogus", {std::nullopt, std::nullopt});
+    return insert("amogus", {std::nullopt, std::nullopt});*/
+
+    Condition cond(str);
+    //return select("amogus", {"c2", "c1"}, cond);
+    return deleteRows("amogus", cond);
 }

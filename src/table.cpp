@@ -6,6 +6,7 @@
 #include "DataBase.h"
 #include "Creator.h"
 #include "Table.h"
+#include "Expression.h"
 
 Table Table::insert(std::vector<std::optional<std::any>> row)
 {
@@ -53,7 +54,7 @@ Table Table::insert(std::vector<std::optional<std::any>> row)
 
 void Table::save(std::string path)
 {
-    std::string tpath = path + "/" + name + ".csv";
+    std::string tpath = path + "/" + name + ".tsv";
     std::string ipath = path + "/" + name + ".info";
 
     std::ofstream tstream(tpath);
@@ -86,7 +87,7 @@ void Table::save(std::string path)
 
 void Table::load(std::string path)
 {
-    std::string tpath = path + "/" + name + ".csv";
+    std::string tpath = path + "/" + name + ".tsv";
     std::string ipath = path + "/" + name + ".info";
 
     std::ifstream istream(ipath);
@@ -140,4 +141,96 @@ void Table::load(std::string path)
         rows.emplace_back(std::move(nRow));
     }
     tstream.close();
+}
+
+Table Table::select(std::vector<std::string> cols, Condition &cond)
+{
+    Table res(false);
+    for (auto it : cols)
+    {
+        if (this->columns.find(it) == this->columns.end())
+        {
+            return res;
+        }
+    }
+
+    Table ret(true);
+    ret.name = name;
+    for (int i = 0; i < cols.size(); i++)
+    {
+        ret.columnOrder[i] = cols[i];
+        ret.columns[cols[i]] = columns[cols[i]];
+        ret.columns[cols[i]].number = i;
+    }
+
+    for (auto &it : rows)
+    {
+        bool flag = cond.apply(it);
+        if (!flag)
+        {
+            continue;
+        }
+
+        Row nRow(columns);
+        nRow.sz = cols.size();
+        nRow.v.resize(nRow.sz);
+        for (int i = 0; i < cols.size(); i++)
+        {
+            nRow.v[i] = it.v[ret.columns[cols[i]].number]->clone();
+        }
+        ret.rows.emplace_back(std::move(nRow));
+    }
+
+    return ret;
+}
+
+Table Table::deleteRows(Condition &cond)
+{
+    Table ret(true);
+    ret.name = name;
+    ret.columns = columns;
+    ret.columnOrder = columnOrder;
+
+    auto it = rows.begin();
+    while (it != rows.end())
+    {
+        bool flag = cond.apply(*it);
+        if (flag)
+        {
+            auto itSwap = it;
+            ++itSwap;
+            ret.rows.emplace_back(std::move(*it));
+            rows.erase(it);
+            it = itSwap;
+        }
+        else 
+        {
+            ++it;
+        }
+    }
+
+    return ret;
+}
+
+Table Table::update(std::string allexpr, std::string cond)
+{
+    ExpressionParcer expr(allexpr);
+    Condition condition(cond);
+    for (auto &it : rows)
+    {
+        bool flag = condition.apply(it);
+        if (!flag)
+        {
+            continue;
+        }
+
+        std::vector<std::unique_ptr<Cell>> values = expr.get_values(it);
+        for (int i = 0; i < values.size(); i++)
+        {
+            it.v[columns[expr.updating[i]].number] = std::move(values[i]);
+        }
+    }
+
+    Table ret(true);
+    return ret;
 }

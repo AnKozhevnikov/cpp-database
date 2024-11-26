@@ -7,9 +7,7 @@ int main()
     DataBase db;
     //auto response = db.query("");
     db.load("db");
-    db.save("db");
-    //std::string arithm = "c1=c2";
-    //Condition cond(arithm);
-    //bool res = cond.apply(db.tables["amogus"].rows.front());
+    //db.save("db");
+    auto response = db.query("c1=c2");
     return 0;
 }
