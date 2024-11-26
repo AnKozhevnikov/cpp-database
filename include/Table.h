@@ -59,7 +59,7 @@ class Table
 {
   public:
     Table() = default;
-    Table(bool s) : status(s)
+    Table(bool s) : status(s), columns(), columnOrder(), rows()
     {
     }
 
@@ -75,6 +75,7 @@ class Table
             name = other.name;
             status = other.status;
 
+            rows.clear();
             for (auto &it : other.rows)
             {
                 rows.emplace_back(std::move(it));
@@ -90,6 +91,7 @@ class Table
           name(other.name),
           status(other.status)
     {
+        rows.clear();
         for (auto &it : other.rows)
         {
             rows.emplace_back(std::move(it));
@@ -102,7 +104,6 @@ class Table
         return status;
     }
 
-    Table insert(std::vector<std::optional<std::any>> row);
     Table insertArr(std::vector<std::optional<std::string>> row);
     Table insertMap(std::map<std::string, std::string> row);
     Table select(std::vector<std::string> columns, Condition &cond);

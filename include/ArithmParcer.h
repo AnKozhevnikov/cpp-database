@@ -12,12 +12,6 @@ class ArithmParser
     {
         Quote,
         Par,
-        Op_not,
-        Op_mul,
-        Op_div,
-        Op_mod,
-        Op_plus,
-        Op_minus,
         Op_abs,
         Op_eq,
         Op_noteq,
@@ -28,6 +22,12 @@ class ArithmParser
         Op_and,
         Op_xor,
         Op_or,
+        Op_plus,
+        Op_minus,
+        Op_mul,
+        Op_div,
+        Op_mod,
+        Op_not,
         Var
     };
     static void rec_parse(const std::string& str, Order_type cur_token, int left, int right, std::vector<std::shared_ptr<Token>>& ans);
