@@ -13,6 +13,8 @@ static std::string strip(std::string str)
         right--;
     return str.substr(left, right - left + 1);
 }
+
+
 static std::string get_space_word(std::string str, int &start)
 {
     int left = start;
@@ -35,9 +37,8 @@ static std::string get_space_word(std::string str, int &start)
 
 static int unquote_find(std::string origin_str, std::string to_find, int start = 0)
 {
-    origin_str = origin_str.substr(start);
-    int first = 0;
-    int second = origin_str.find("\"");
+    int first = start;
+    int second = origin_str.find("\"", start);
 
     for (; first != std::string::npos;)
     {
