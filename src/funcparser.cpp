@@ -53,14 +53,14 @@ static int unquote_find(std::string origin_str, std::string to_find, int start =
         {
             first = origin_str.find("\"", moving_ptr + 1);
             moving_ptr = first;
-        } while (first != std::string::npos && origin_str[first - 1] == '//');
+        } while (first != std::string::npos && origin_str[first - 1] == '\\');
         moving_ptr = first;
 
         do
         {
             second = origin_str.find("\"", moving_ptr + 1);
             moving_ptr = first;
-        } while (first != std::string::npos && origin_str[first - 1] == '//');
+        } while (first != std::string::npos && origin_str[first - 1] == '\\');
     }
     return -1;
 }
@@ -83,9 +83,9 @@ Table DataBase::execute(std::string query)
         int to_pos = query.find("to", query.rfind(')'));
         if (to_pos == -1)
             throw std::runtime_error("FuncParser:: no to in insert found");
-        int prev = 0;
+        int prev = query.find('(')+1;
         std::vector<std::string> values;
-        int next = unquote_find(query, std::string(","), prev);
+        int next = unquote_find(query, std::string(","), 0);
         while (next != std::string::npos)
         {
             values.emplace_back(strip(query.substr(prev, next - prev)));
@@ -154,7 +154,7 @@ Table DataBase::execute(std::string query)
             prev = next + 1;
             next = unquote_find(query, std::string(","), prev);
         }
-        columns.emplace_back(strip(query.substr(prev, where_pos - prev)));
+        columns.emplace_back(strip(query.substr(prev, from_pos - prev)));
         if (where_pos == -1)
         {
             return select(strip(query.substr(from_pos + 4, where_pos - from_pos - 4)), columns, tmp);
