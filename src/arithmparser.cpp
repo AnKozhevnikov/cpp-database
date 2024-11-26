@@ -1,5 +1,6 @@
 #include <ArithmParcer.h>
 #include <stdexcept>
+#include <algorithm>
 
 static std::map<ArithmParser::Order_type, Token::Token_types> order_to_token = {
     {ArithmParser::Order_type::Op_not, Token::Token_types::Op_not},
@@ -33,7 +34,7 @@ static std::map<ArithmParser::Order_type, std::string> order_to_string = {{Arith
 void ArithmParser::rec_parse(const std::string &str, ArithmParser::Order_type cur_token, int left, int right,
                              std::vector<std::shared_ptr<Token>> &ans)
 {
-    if (left >= right)
+    if (left > right)
         return;
         
     while (std::isspace(static_cast<unsigned char>(str[left])) && left <= right)
@@ -200,5 +201,6 @@ std::vector<std::shared_ptr<Token>> ArithmParser::arithm_parse(std::string origi
         output.emplace_back(op_stack.back());
         op_stack.pop_back();
     }
+
     return output;
 }
