@@ -1,6 +1,18 @@
 #include <ArithmParcer.h>
-
 #include <stdexcept>
+
+static std::map<ArithmParser::Order_type, Token::Token_types> order_to_token = {
+    {ArithmParser::Order_type::Op_not, Token::Token_types::Op_not},
+    {ArithmParser::Order_type::Op_mul, Token::Token_types::Op_mul},    {ArithmParser::Order_type::Op_div, Token::Token_types::Op_div},
+    {ArithmParser::Order_type::Op_mod, Token::Token_types::Op_mod},    {ArithmParser::Order_type::Op_plus, Token::Token_types::Op_plus},
+    {ArithmParser::Order_type::Op_minus, Token::Token_types::Op_minus},  {ArithmParser::Order_type::Op_eq, Token::Token_types::Op_eq},
+    {ArithmParser::Order_type::Op_noteq, Token::Token_types::Op_noteq}, {ArithmParser::Order_type::Op_l, Token::Token_types::Op_l},
+    {ArithmParser::Order_type::Op_leq, Token::Token_types::Op_leq},   {ArithmParser::Order_type::Op_g, Token::Token_types::Op_g},
+    {ArithmParser::Order_type::Op_geq, Token::Token_types::Op_geq},   {ArithmParser::Order_type::Op_and, Token::Token_types::Op_and},
+    {ArithmParser::Order_type::Op_xor, Token::Token_types::Op_xor},   {ArithmParser::Order_type::Op_or, Token::Token_types::Op_or}};
+
+
+
 
 static std::map<Token::Token_types, int> operations_precedence = {
     {Token::Token_types::Op_not, 0}, {Token::Token_types::Op_mul, 1},   {Token::Token_types::Op_div, 1},
@@ -128,7 +140,7 @@ void ArithmParser::rec_parse(const std::string &str, ArithmParser::Order_type cu
         while (next <= right && next != std::string::npos)
         {
             rec_parse(str, static_cast<ArithmParser::Order_type>(cur_token + 1), cur_start, next - 1, ans);
-            ans.push_back(std::make_shared<OpToken>(static_cast<Token::Token_types>(cur_token + static_cast<int>(Token::Token_types::Op_not) - 2)));
+            ans.push_back(std::make_shared<OpToken>(order_to_token[cur_token]));
             cur_start = next + 1;
             next = str.find(order_to_string[cur_token], cur_start);
         }
