@@ -1,6 +1,4 @@
 .vscode
 build/*
-Untitled-1.cpp
 *.exe
 .gitignore
-arithm_parser.cpp
