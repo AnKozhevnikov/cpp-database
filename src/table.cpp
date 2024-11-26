@@ -1,12 +1,12 @@
 #include <fstream>
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
-#include "DataBase.h"
 #include "Creator.h"
-#include "Table.h"
+#include "DataBase.h"
 #include "Expression.h"
+#include "Table.h"
 
 Table Table::insert(std::vector<std::optional<std::any>> row)
 {
@@ -41,7 +41,94 @@ Table Table::insert(std::vector<std::optional<std::any>> row)
             nCell = creator.generateCell(vt, row[num].value());
         }
 
-        
+        nRow.v[num] = std::move(nCell);
+    }
+
+    rows.emplace_back(std::move(nRow));
+
+    Table tab(true);
+    return tab;
+}
+
+Table Table::insertArr(std::vector<std::optional<std::string>> row)
+{
+    Row nRow(&columns);
+    nRow.sz = row.size();
+
+    if (nRow.sz != columns.size())
+    {
+        Table tab(false);
+        return tab;
+    }
+
+    nRow.v.resize(nRow.sz);
+    for (int i = 0; i < row.size(); ++i)
+    {
+        std::shared_ptr<ValueType> vt = columns[columnOrder[i]].vtype;
+        std::unique_ptr<Cell> nCell;
+        if (row[i] != std::nullopt)
+        {
+            if ((columns[columnOrder[i]].attr & AUTOINCREMENT) != 0 && rows.size() > 0)
+            {
+                nCell = rows.back().v[i]->clone();
+                nCell->inc();
+            }
+            else if (columns[columnOrder[i]].baseValue.has_value())
+            {
+                nCell = Creator::generateCell(vt, columns[columnOrder[i]].baseValue.value());
+            }
+            else
+            {
+                Table tab(false);
+                return tab;
+            }
+        }
+        else
+        {
+            nCell = Creator::generateCell(vt, Creator::generateValue(vt, row[i].value()).value());
+        }
+        nRow.v[i] = std::move(nCell);
+    }
+
+    rows.emplace_back(std::move(nRow));
+
+    Table tab(true);
+    return tab;
+}
+
+Table Table::insertMap(std::map<std::string, std::string> row)
+{
+    Row nRow(&columns);
+    nRow.sz = columns.size();
+    nRow.v.resize(nRow.sz);
+    for (auto it : columns)
+    {
+        std::string columnName = it.first;
+        int num = it.second.number;
+        std::shared_ptr<ValueType> vt = it.second.vtype;
+        Creator creator;
+        std::unique_ptr<Cell> nCell = nullptr;
+        if (row.find(columnName) == row.end())
+        {
+            if ((it.second.attr & AUTOINCREMENT) != 0 && rows.size() > 0)
+            {
+                nCell = rows.back().v[num]->clone();
+                nCell->inc();
+            }
+            else if (it.second.baseValue.has_value())
+            {
+                nCell = creator.generateCell(vt, it.second.baseValue.value());
+            }
+            else
+            {
+                Table tab(false);
+                return tab;
+            }
+        }
+        else
+        {
+            nCell = creator.generateCell(vt, creator.generateValue(vt, row[columnName]).value());
+        }
 
         nRow.v[num] = std::move(nCell);
     }
@@ -58,7 +145,7 @@ void Table::save(std::string path)
     std::string ipath = path + "/" + name + ".info";
 
     std::ofstream tstream(tpath);
-    for (auto& it1 : rows)
+    for (auto &it1 : rows)
     {
         for (int i = 0; i < it1.v.size(); i++)
         {
@@ -75,7 +162,8 @@ void Table::save(std::string path)
     std::ofstream istream(ipath);
     for (auto it2 : columns)
     {
-        istream << it2.first << separator << Creator::stringFromValueType(it2.second.vtype) << separator << it2.second.attr << separator << it2.second.number;
+        istream << it2.first << separator << Creator::stringFromValueType(it2.second.vtype) << separator
+                << it2.second.attr << separator << it2.second.number;
         {
             std::unique_ptr<Cell> nCell = Creator().generateCell(it2.second.vtype, it2.second.baseValue.value());
             istream << separator << nCell->toString();
@@ -136,7 +224,8 @@ void Table::load(std::string path)
             std::string cell;
             std::getline(ss, cell, separator);
             Creator creator;
-            nRow.v[i] = creator.generateCell(columns[columnOrder[i]].vtype, creator.generateValue(columns[columnOrder[i]].vtype, cell).value());
+            nRow.v[i] = creator.generateCell(columns[columnOrder[i]].vtype,
+                                             creator.generateValue(columns[columnOrder[i]].vtype, cell).value());
         }
         rows.emplace_back(std::move(nRow));
     }
@@ -176,7 +265,7 @@ Table Table::select(std::vector<std::string> cols, Condition &cond)
         nRow.v.resize(nRow.sz);
         for (int i = 0; i < cols.size(); i++)
         {
-            nRow.v[i] = it.v[ret.columns[cols[i]].number]->clone();
+            nRow.v[i] = it.v[columns[cols[i]].number]->clone();
         }
         ret.rows.emplace_back(std::move(nRow));
     }
@@ -203,7 +292,7 @@ Table Table::deleteRows(Condition &cond)
             rows.erase(it);
             it = itSwap;
         }
-        else 
+        else
         {
             ++it;
         }

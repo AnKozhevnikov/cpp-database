@@ -34,14 +34,47 @@ std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype,
         {
             return s.substr(1, s.size() - 2);
         }
+        else
+        {
+            throw std::invalid_argument("Invalid string");
+        }
         return s;
     case ByteArray: {
         std::vector<int8_t> v;
-        for (int i = 0; i < s.size(); ++i)
+        if (s.size() > 2 && s[0] == '0' && s[1] == 'x')
         {
-            v.push_back(s[i] - '0');
+            s = s.substr(2);
+            if (s.size() % 2 != 0)
+            {
+                throw std::invalid_argument("Invalid bytearray");
+            }
+            for (int i = 0; i < s.size(); i += 2)
+            {
+                if (!((s[i] >= '0' && s[i] <= '9') || (s[i] >= 'a' && s[i] <= 'f')))
+                {
+                    throw std::invalid_argument("Invalid bytearray");
+                }
+                int c1 = s[i] >= '0' && s[i] <= '9' ? s[i] - '0' : s[i] - 'a' + 10;
+                int c2 = s[i + 1] >= '0' && s[i + 1] <= '9' ? s[i + 1] - '0' : s[i + 1] - 'a' + 10;
+                v.push_back(c1 * 16 + c2);
+            }
         }
-        return v;
+        else if (s[0] == '"' && s.back() == '"')
+        {
+            s = s.substr(1, s.size() - 2);
+            for (char c : s)
+            {
+                if (c < '0' || c > '8')
+                {
+                    throw std::invalid_argument("Invalid bytearray");
+                }
+                v.push_back(c - '0');
+            }
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid bytearray");
+        }
     }
     default:
         throw std::invalid_argument("Invalid type");
@@ -62,19 +95,19 @@ std::shared_ptr<ValueType> Creator::generateValueType(std::string s)
         s = s.substr(0, i);
     }
 
-    if (s == "int")
+    if (s == "int" || s == "Int")
     {
         return std::make_shared<ValueType>(Int);
     }
-    else if (s == "bool")
+    else if (s == "bool" || s == "Bool")
     {
         return std::make_shared<ValueType>(Bool);
     }
-    else if (s == "string")
+    else if (s == "string" || s == "String")
     {
         return std::make_shared<ValueType>(String);
     }
-    else if (s == "bytearray")
+    else if (s == "bytearray" || s == "ByteArray")
     {
         return std::make_shared<ByteArrayType>(std::stoi(args));
     }
@@ -100,7 +133,13 @@ std::unique_ptr<Cell> Creator::cellFromRawString(std::string s)
         {
             return std::make_unique<BoolCell>(s == "True");
         }
-        
+
+        if (s.size() >= 2 && s[0] == '0' && s[1] == 'x')
+        {
+            std::shared_ptr<ValueType> t = std::make_shared<ByteArrayType>((s.size() - 2) / 2);
+            return generateCell(t, generateValue(t, s));
+        }
+
         throw std::invalid_argument("Unknown type");
     }
 }

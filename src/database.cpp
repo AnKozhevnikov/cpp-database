@@ -40,6 +40,28 @@ Table DataBase::insert(std::string s, std::vector<std::optional<std::any>> row)
     return tables[s].insert(row);
 }
 
+Table DataBase::insertArr(std::string s, std::vector<std::optional<std::string>> row)
+{
+    if (tables.find(s) == tables.end() || tables[s].columns.size() != row.size())
+    {
+        Table t(false);
+        return t;
+    }
+
+    return tables[s].insertArr(row);
+}
+
+Table DataBase::insertMap(std::string s, std::map<std::string, std::string> row)
+{
+    if (tables.find(s) == tables.end() || tables[s].columns.size() != row.size())
+    {
+        Table t(false);
+        return t;
+    }
+
+    return tables[s].insertMap(row);
+}
+
 void DataBase::save(std::string path)
 {
     std::error_code ec;
@@ -135,19 +157,15 @@ Table DataBase::query(std::string str)
     std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t1 = {"c1", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
     std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t2 = {"c2", std::make_shared<ValueType>(Int), 0, 0};
     std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t3 = {"c3", std::make_shared<ValueType>(String), std::string("baseString"), 0};
-    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t1, t2};
+    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t1, t2, t3};
     createTable("amogus", v);
 
-    //insert("amogus", {std::nullopt, std::nullopt, std::nullopt});
-    //insert("amogus", {std::nullopt, std::nullopt, std::string("s1")});
-    //insert("amogus", {std::nullopt, 2, std::string("s2")}); 
-    insert("amogus", {1, 2});
-    insert("amogus", {2, 3});
-    insert("amogus", {3, 3});
+    insert("amogus", {std::nullopt, std::nullopt, std::nullopt});
+    insert("amogus", {std::nullopt, std::nullopt, std::string("s1")});
+    insert("amogus", {std::nullopt, 2, std::string("s2")}); 
     
     Condition cond("c1=c2");
-    Table r = select("amogus", {"c2"}, cond);
-    Table ret(true);
+    Table r = select("amogus", {"c3"}, cond);
     return r;
 
     /*Condition cond(str);
