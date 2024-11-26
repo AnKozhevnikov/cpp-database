@@ -29,13 +29,12 @@ class DataBase
     Table deleteRows(std::string s, Condition &cond);
     Table update(std::string s, std::string allexpr, std::string cond);
 
-    Table exucute(std::string);
-
   public:
     std::map<std::string, Table> tables;
 
   public:
     Table query(std::string q);
+    Table execute(std::string q);
     void save(std::string path);
     void load(std::string path);
 };
