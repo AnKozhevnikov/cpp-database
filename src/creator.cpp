@@ -30,7 +30,7 @@ std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype,
     case Bool:
         return s == "1" || s == "True";
     case String:
-        if (s[0] == '"' && s.back() == '"')
+        if (s[0] == '\"' && s.back() == '\"')
         {
             return s.substr(1, s.size() - 2);
         }
@@ -59,7 +59,7 @@ std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype,
                 v.push_back(c1 * 16 + c2);
             }
         }
-        else if (s[0] == '"' && s.back() == '"')
+        else if (s[0] == '\"' && s.back() == '\"')
         {
             s = s.substr(1, s.size() - 2);
             for (char c : s)
@@ -75,6 +75,13 @@ std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype,
         {
             throw std::invalid_argument("Invalid bytearray");
         }
+
+        if (v.size() != std::dynamic_pointer_cast<ByteArrayType>(vtype)->size)
+        {
+            throw std::invalid_argument("Invalid bytearray");
+        }
+
+        return v;
     }
     default:
         throw std::invalid_argument("Invalid type");

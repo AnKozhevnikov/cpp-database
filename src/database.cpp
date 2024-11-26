@@ -3,7 +3,7 @@
 #include <set>
 
 Table DataBase::createTable(std::string s,
-                                      std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> info)
+                                      std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> info)
 {
     if (tables.find(s) != tables.end())
     {
@@ -20,7 +20,14 @@ Table DataBase::createTable(std::string s,
         tables[s].columns[columnName].number = i;
         tables[s].columns[columnName].attr = std::get<int>(info[i]);
         tables[s].columns[columnName].vtype = std::get<std::shared_ptr<ValueType>>(info[i]);
-        tables[s].columns[columnName].baseValue = std::get<std::optional<std::any>>(info[i]);
+        if (std::get<std::optional<std::string>>(info[i]).has_value())
+        {
+            tables[s].columns[columnName].baseValue = Creator::generateValue(tables[s].columns[columnName].vtype, std::get<std::optional<std::string>>(info[i]).value());
+        }
+        else
+        {
+            tables[s].columns[columnName].baseValue = std::nullopt;
+        }
 
         tables[s].columnOrder[i] = columnName;
     }
@@ -154,10 +161,10 @@ Table DataBase::update(std::string s, std::string allexpr, std::string cond)
 Table DataBase::query(std::string str)
 {
     // placeholder
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t1 = {"c1", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t2 = {"c2", std::make_shared<ValueType>(Int), 0, 0};
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t3 = {"c3", std::make_shared<ValueType>(String), std::string("baseString"), 0};
-    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t1, t2, t3};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t1 = {"c1", std::make_shared<ValueType>(Int), "0", AUTOINCREMENT};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t2 = {"c2", std::make_shared<ValueType>(Int), "0", 0};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t3 = {"c3", std::make_shared<ValueType>(String), std::string("\"baseString\""), 0};
+    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> v = {t1, t2, t3};
     createTable("amogus", v);
 
     insert("amogus", {std::nullopt, std::nullopt, std::nullopt});

@@ -21,7 +21,7 @@
 class DataBase
 {
   private:
-    Table createTable(std::string s, std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> info);
+    Table createTable(std::string s, std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> info);
     Table insert(std::string s, std::vector<std::optional<std::any>> row);
     Table insertArr(std::string s, std::vector<std::optional<std::string>> row);
     Table insertMap(std::string s, std::map<std::string, std::string> row);
