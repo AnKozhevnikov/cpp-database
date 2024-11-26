@@ -147,6 +147,19 @@ std::unique_ptr<Cell> Creator::cellFromRawString(std::string s)
             return generateCell(t, generateValue(t, s));
         }
 
+        bool isInt = true;
+        for (int i = 0; i < s.size(); ++i)
+        {
+            if (s[i] < '0' || s[i] > '9')
+            {
+                isInt = false;
+                break;
+            }
+        }
+        if (isInt) {
+            return generateCell(std::make_shared<ValueType>(Int), std::stoi(s));
+        }
+
         throw std::invalid_argument("Unknown type");
     }
 }

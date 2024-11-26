@@ -26,13 +26,6 @@ std::unique_ptr<Cell> PRN_complier::eval(const Row &cur_row) const
         return nullptr;
     std::vector<std::shared_ptr<Token>> cur_stack;
 
-    for (int i = 0; i < cur_stack.size(); i++)
-    {
-        if (cur_stack[i]->type == Token::Token_types::String)
-        {
-            cur_stack[i] = std::make_shared<VarToken>(cur_row, std::dynamic_pointer_cast<StrToken>(cur_stack[i]));
-        }
-    }
     for (auto i : PRN_tokens)
     {
         if (i->type == Token::Token_types::String)
