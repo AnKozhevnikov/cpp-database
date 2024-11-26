@@ -5,14 +5,20 @@
 int main()
 {
     DataBase db;
-    //auto response = db.query("");
     db.load("db");
-    //db.save("db");
-    /*for (auto &it : response)
+    auto response = db.execute("select c3 from amogus where c1 = c2");
+    for (auto &it : response)
     {
         std::string s = it.get<std::string>("c3");
         std::cout << s << std::endl;
-    }*/
-    auto response = db.execute("select c3 from amogus where c1 = c2");
+    }
+    response = db.execute("insert (5,5,\"goyda\") to amogus");
+    response = db.execute("select c1,c2,c3 from amogus");
+    for (auto &it : response) {
+        int c1 = it.get<int>("c1");
+        int c2 = it.get<int>("c2");
+        std::string c3 = it.get<std::string>("c3");
+        std::cout << c1 << ' ' << c2 << ' ' << c3 << std::endl;
+    }
     return 0;
 }
