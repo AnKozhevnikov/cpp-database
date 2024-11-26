@@ -44,7 +44,7 @@ static int unquote_find(std::string origin_str, std::string to_find, int start =
         int pos = origin_str.find(to_find, first);
         if (pos == std::string::npos)
             return -1;
-        if (pos < second)
+        if (pos < second || second == std::string::npos)
         {
             return pos;
         }
