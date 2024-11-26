@@ -35,11 +35,11 @@ static std::string get_space_word(std::string str, int &start)
 
 static int unquote_find(std::string origin_str, std::string to_find, int start = 0)
 {
-    int first = 0;
-    int second = origin_str.find(to_find);
     origin_str = origin_str.substr(start);
-    for (; first != std::string::npos;
-         first = origin_str.find(to_find, second + 1), second = origin_str.find(to_find, first + 1))
+    int first = 0;
+    int second = origin_str.find("\"");
+
+    for (; first != std::string::npos;)
     {
         int pos = origin_str.find(to_find, first);
         if (pos == std::string::npos)
@@ -51,14 +51,14 @@ static int unquote_find(std::string origin_str, std::string to_find, int start =
         int moving_ptr = second;
         do
         {
-            first = origin_str.find(to_find, moving_ptr + 1);
+            first = origin_str.find("\"", moving_ptr + 1);
             moving_ptr = first;
         } while (first != std::string::npos && origin_str[first - 1] == '//');
         moving_ptr = first;
 
         do
         {
-            second = origin_str.find(to_find, moving_ptr + 1);
+            second = origin_str.find("\"", moving_ptr + 1);
             moving_ptr = first;
         } while (first != std::string::npos && origin_str[first - 1] == '//');
     }
@@ -86,23 +86,22 @@ Table DataBase::execute(std::string query)
         int prev = 0;
         std::vector<std::string> values;
         int next = unquote_find(query, std::string(","), prev);
-            while (next != std::string::npos)
-            {
-                values.emplace_back(strip(query.substr(prev, next - prev)));
-                prev = next + 1;
-                next = unquote_find(query, std::string(","), prev);
-            }
-            values.emplace_back(strip(query.substr(prev, query.rfind(')') - prev)));
-            
+        while (next != std::string::npos)
+        {
+            values.emplace_back(strip(query.substr(prev, next - prev)));
+            prev = next + 1;
+            next = unquote_find(query, std::string(","), prev);
+        }
+        values.emplace_back(strip(query.substr(prev, query.rfind(')') - prev)));
+
         if (unquote_find(query, std::string("="), prev) != -1)
         {
             std::map<std::string, std::string> map_values;
-            for (std::string&  i : values)
+            for (std::string &i : values)
             {
                 int sep = unquote_find(i, std::string("="));
-                map_values.insert({strip (i.substr(0, sep)), strip(i.substr(sep + 1))});
+                map_values.insert({strip(i.substr(0, sep)), strip(i.substr(sep + 1))});
             }
-
         }
         else
         {
@@ -116,7 +115,6 @@ Table DataBase::execute(std::string query)
             }
             return insertArr(strip(query.substr(to_pos + 2)), tmp);
         }
-
     }
     else if (type_query == "delete")
     {
