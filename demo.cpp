@@ -5,9 +5,13 @@
 int main()
 {
     DataBase db;
-    //auto response = db.query("");
-    db.load("db");
+    auto response = db.query("");
+    //db.load("db");
     //db.save("db");
-    auto response = db.query("c1=c2");
+    for (auto &it : response)
+    {
+        int s = it.get<int>("c2");
+        std::cout << s << std::endl;
+    }
     return 0;
 }

@@ -114,6 +114,7 @@ class ByteArrayCell : public Cell
     ByteArrayCell(std::vector<int8_t> v) : value(v)
     {
     }
+
     virtual std::unique_ptr<Cell> opG(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opL(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opEq(const std::unique_ptr<Cell> &right) const;

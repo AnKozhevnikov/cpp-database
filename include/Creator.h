@@ -15,4 +15,5 @@ class Creator
     static std::shared_ptr<ValueType> generateValueType(std::string s);
     static std::unique_ptr<Cell> cellFromRawString(std::string s);
     static std::string stringFromValueType(std::shared_ptr<ValueType> vtype);
+    static std::any valFromCell(std::shared_ptr<ValueType> vtype, const std::unique_ptr<Cell> &cell);
 };

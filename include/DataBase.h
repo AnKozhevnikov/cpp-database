@@ -23,12 +23,13 @@ class DataBase
   private:
     Table createTable(std::string s, std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> info);
     Table insert(std::string s, std::vector<std::optional<std::any>> row);
-    Table select(std::string s, std::vector<std::string> columns, Condition &cond);
+    Table select(std::string s, std::vector<std::string> cols, Condition &cond);
     Table deleteRows(std::string s, Condition &cond);
     Table update(std::string s, std::string allexpr, std::string cond);
 
-  public:
     std::map<std::string, Table> tables;
+
+  public:
     Table query(std::string q);
     void save(std::string path);
     void load(std::string path);

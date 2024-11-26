@@ -3,10 +3,10 @@
 
 int Row::getPos(std::string name) const
 {
-    if (columns.find(name) != columns.end())
+    if ((*columns).find(name) != columns->end())
     {
-        return columns[name].number;
+        return (*columns)[name].number;
     }
-    columns.erase(name);
+    columns->erase(name);
     return -1;
 }

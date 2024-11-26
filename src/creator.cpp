@@ -121,3 +121,20 @@ std::string Creator::stringFromValueType(std::shared_ptr<ValueType> vtype)
         throw std::invalid_argument("Invalid type");
     }
 }
+
+std::any Creator::valFromCell(std::shared_ptr<ValueType> vtype, const std::unique_ptr<Cell> &cell)
+{
+    switch (vtype->type)
+    {
+    case Int:
+        return dynamic_cast<IntCell &>(*cell).value;
+    case Bool:
+        return dynamic_cast<BoolCell &>(*cell).value;
+    case String:
+        return dynamic_cast<StringCell &>(*cell).value;
+    case ByteArray:
+        return dynamic_cast<ByteArrayCell &>(*cell).value;
+    default:
+        throw std::invalid_argument("Invalid type");
+    }
+}

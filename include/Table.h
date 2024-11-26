@@ -4,10 +4,56 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "ColumnInfo.h"
-#include "Row.h"
 #include "Condition.h"
+#include "Row.h"
+
+class TableIterator
+{
+  public:
+    TableIterator(std::list<Row>::iterator it) : it(it)
+    {
+    }
+    TableIterator &operator++()
+    {
+        it++;
+        return *this;
+    }
+    TableIterator operator++(int)
+    {
+        TableIterator tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+    TableIterator &operator--()
+    {
+        it--;
+        return *this;
+    }
+    TableIterator operator--(int)
+    {
+        TableIterator tmp = *this;
+        --(*this);
+        return tmp;
+    }
+    bool operator==(const TableIterator &rhs) const
+    {
+        return it == rhs.it;
+    }
+    bool operator!=(const TableIterator &rhs) const
+    {
+        return it != rhs.it;
+    }
+    const Row &operator*() const
+    {
+        return *it;
+    }
+
+  private:
+    std::list<Row>::iterator it;
+};
 
 class Table
 {
@@ -15,6 +61,40 @@ class Table
     Table() = default;
     Table(bool s) : status(s)
     {
+    }
+
+    Table &operator=(const Table &other) = delete;
+    Table(const Table &other) = delete;
+
+    Table &operator=(Table &&other)
+    {
+        if (this != &other)
+        {
+            columns = other.columns;
+            columnOrder = other.columnOrder;
+            name = other.name;
+            status = other.status;
+
+            for (auto &it : other.rows)
+            {
+                rows.emplace_back(std::move(it));
+                rows.back().columns = &columns;
+            }
+        }
+        return *this;
+    }
+
+    Table(Table &&other)
+        : columns(other.columns),
+          columnOrder(other.columnOrder),
+          name(other.name),
+          status(other.status)
+    {
+        for (auto &it : other.rows)
+        {
+            rows.emplace_back(std::move(it));
+            rows.back().columns = &columns;
+        }
     }
 
     bool is_ok()
@@ -28,6 +108,16 @@ class Table
     Table update(std::string allexpr, std::string cond);
     void save(std::string path);
     void load(std::string path);
+
+    TableIterator begin()
+    {
+        return TableIterator(rows.begin());
+    }
+
+    TableIterator end()
+    {
+        return TableIterator(rows.end());
+    }
 
   private:
     std::map<std::string, ColumnInfo> columns;

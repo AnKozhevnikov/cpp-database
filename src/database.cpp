@@ -11,6 +11,7 @@ Table DataBase::createTable(std::string s,
         return t;
     }
 
+    tables[s].status = true;
     tables[s].name = s;
 
     for (int i = 0; i < info.size(); ++i)
@@ -25,7 +26,7 @@ Table DataBase::createTable(std::string s,
     }
 
     Table t(true);
-    return t;
+    return std::move(t);
 }
 
 Table DataBase::insert(std::string s, std::vector<std::optional<std::any>> row)
@@ -93,7 +94,7 @@ void DataBase::load(std::string path)
     }
 }
 
-Table DataBase::select(std::string s, std::vector<std::string> columns, Condition &cond)
+Table DataBase::select(std::string s, std::vector<std::string> cols, Condition &cond)
 {
     if (tables.find(s) == tables.end())
     {
@@ -101,7 +102,9 @@ Table DataBase::select(std::string s, std::vector<std::string> columns, Conditio
         return t;
     }
 
-    return tables[s].select(columns, cond);
+    Table ret = tables[s].select(cols, cond);
+
+    return std::move(ret);
 }
 
 Table DataBase::deleteRows(std::string s, Condition &cond)
@@ -129,15 +132,25 @@ Table DataBase::update(std::string s, std::string allexpr, std::string cond)
 Table DataBase::query(std::string str)
 {
     // placeholder
-    /*std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t1 = {"c1", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t1 = {"c1", std::make_shared<ValueType>(Int), 0, AUTOINCREMENT};
     std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t2 = {"c2", std::make_shared<ValueType>(Int), 0, 0};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int> t3 = {"c3", std::make_shared<ValueType>(String), std::string("baseString"), 0};
     std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::any>, int>> v = {t1, t2};
     createTable("amogus", v);
 
-    insert("amogus", {std::nullopt, std::nullopt});
-    return insert("amogus", {std::nullopt, std::nullopt});*/
+    //insert("amogus", {std::nullopt, std::nullopt, std::nullopt});
+    //insert("amogus", {std::nullopt, std::nullopt, std::string("s1")});
+    //insert("amogus", {std::nullopt, 2, std::string("s2")}); 
+    insert("amogus", {1, 2});
+    insert("amogus", {2, 3});
+    insert("amogus", {3, 3});
+    
+    Condition cond("c1=c2");
+    Table r = select("amogus", {"c2"}, cond);
+    Table ret(true);
+    return r;
 
-    Condition cond(str);
-    //return select("amogus", {"c2", "c1"}, cond);
-    return deleteRows("amogus", cond);
+    /*Condition cond(str);
+    return select("amogus", {"c2", "c1"}, cond);
+    return deleteRows("amogus", cond);*/
 }
