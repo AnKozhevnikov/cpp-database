@@ -120,5 +120,6 @@ class ByteArrayCell : public Cell
     virtual std::unique_ptr<Cell> opGeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opAbs() const;
     std::vector<int8_t> value;
 };

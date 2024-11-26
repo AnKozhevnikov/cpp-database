@@ -71,3 +71,8 @@ std::unique_ptr<Cell> ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) c
 {
     return std::make_unique<BoolCell>(!opEq(right));
 }
+
+std::unique_ptr<Cell> ByteArrayCell::opAbs() const
+{
+    return std::make_unique<IntCell>(value.size());
+}
