@@ -13,7 +13,7 @@ int main()
         std::cout << s << std::endl;
     }
     response = db.execute("insert (5,5,\"goyda\") to amogus");
-    response = db.execute("select c1,c2,c3 from amogus");
+    response = db.execute("select c1,c2,c3 from amogus where c1*5>c2+4");
     for (auto &it : response) {
         int c1 = it.get<int>("c1");
         int c2 = it.get<int>("c2");

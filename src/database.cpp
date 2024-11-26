@@ -36,17 +36,6 @@ Table DataBase::createTable(std::string s,
     return std::move(t);
 }
 
-Table DataBase::insert(std::string s, std::vector<std::optional<std::any>> row)
-{
-    if (tables.find(s) == tables.end() || tables[s].columns.size() != row.size())
-    {
-        Table t(false);
-        return t;
-    }
-
-    return tables[s].insert(row);
-}
-
 Table DataBase::insertArr(std::string s, std::vector<std::optional<std::string>> row)
 {
     if (tables.find(s) == tables.end() || tables[s].columns.size() != row.size())
@@ -156,26 +145,4 @@ Table DataBase::update(std::string s, std::string allexpr, std::string cond)
     }
 
     return tables[s].update(allexpr, cond);
-}
-
-Table DataBase::query(std::string str)
-{
-    // placeholder
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t1 = {"c1", std::make_shared<ValueType>(Int), "0", AUTOINCREMENT};
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t2 = {"c2", std::make_shared<ValueType>(Int), "0", 0};
-    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t3 = {"c3", std::make_shared<ValueType>(String), std::string("\"baseString\""), 0};
-    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> v = {t1, t2, t3};
-    createTable("amogus", v);
-
-    insert("amogus", {std::nullopt, std::nullopt, std::nullopt});
-    insert("amogus", {std::nullopt, std::nullopt, std::string("s1")});
-    insert("amogus", {std::nullopt, 2, std::string("s2")}); 
-    
-    Condition cond("c1=c2");
-    Table r = select("amogus", {"c3"}, cond);
-    return r;
-
-    /*Condition cond(str);
-    return select("amogus", {"c2", "c1"}, cond);
-    return deleteRows("amogus", cond);*/
 }

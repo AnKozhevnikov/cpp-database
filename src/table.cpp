@@ -8,48 +8,6 @@
 #include "Expression.h"
 #include "Table.h"
 
-Table Table::insert(std::vector<std::optional<std::any>> row)
-{
-    Row nRow(&columns);
-    nRow.sz = row.size();
-    nRow.v.resize(nRow.sz);
-    for (auto it : columns)
-    {
-        int num = it.second.number;
-        std::shared_ptr<ValueType> vt = it.second.vtype;
-        Creator creator;
-        std::unique_ptr<Cell> nCell = nullptr;
-        if (!row[num].has_value())
-        {
-            if ((it.second.attr & AUTOINCREMENT) != 0 && rows.size() > 0)
-            {
-                nCell = rows.back().v[num]->clone();
-                nCell->inc();
-            }
-            else if (it.second.baseValue.has_value())
-            {
-                nCell = creator.generateCell(vt, it.second.baseValue.value());
-            }
-            else
-            {
-                Table tab(false);
-                return tab;
-            }
-        }
-        else
-        {
-            nCell = creator.generateCell(vt, row[num].value());
-        }
-
-        nRow.v[num] = std::move(nCell);
-    }
-
-    rows.emplace_back(std::move(nRow));
-
-    Table tab(true);
-    return tab;
-}
-
 Table Table::insertArr(std::vector<std::optional<std::string>> row)
 {
     Row nRow(&columns);
@@ -66,7 +24,7 @@ Table Table::insertArr(std::vector<std::optional<std::string>> row)
     {
         std::shared_ptr<ValueType> vt = columns[columnOrder[i]].vtype;
         std::unique_ptr<Cell> nCell;
-        if (row[i] != std::nullopt)
+        if (row[i] == std::nullopt)
         {
             if ((columns[columnOrder[i]].attr & AUTOINCREMENT) != 0 && rows.size() > 0)
             {
@@ -93,7 +51,7 @@ Table Table::insertArr(std::vector<std::optional<std::string>> row)
     rows.emplace_back(std::move(nRow));
 
     Table tab(true);
-    return tab;
+    return std::move(tab);
 }
 
 Table Table::insertMap(std::map<std::string, std::string> row)
@@ -136,7 +94,7 @@ Table Table::insertMap(std::map<std::string, std::string> row)
     rows.emplace_back(std::move(nRow));
 
     Table tab(true);
-    return tab;
+    return std::move(tab);
 }
 
 void Table::save(std::string path)
