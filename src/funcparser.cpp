@@ -64,7 +64,7 @@ static int unquote_find(std::string origin_str, std::string to_find, int start =
     }
     return -1;
 }
-Table DataBase::exucute(std::string query)
+Table DataBase::execute(std::string query)
 {
     int pos = 0;
     std::string type_query = get_space_word(query, pos);
