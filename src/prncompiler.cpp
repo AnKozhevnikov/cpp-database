@@ -1,8 +1,8 @@
 #include "PRNCompiler.h"
-#include "Cell.h"
 #include "ArithmParcer.h"
-#include <vector>
+#include "Cell.h"
 #include <stdexcept>
+#include <vector>
 
 PRN_complier::PRN_complier(std::string query)
 {
@@ -15,7 +15,7 @@ PRN_complier::PRN_complier(std::string query)
         }
     }
 }
-std::vector<std::shared_ptr<Token>>& PRN_complier::get_tokens()
+std::vector<std::shared_ptr<Token>> &PRN_complier::get_tokens()
 {
     return PRN_tokens;
 }
@@ -24,7 +24,8 @@ std::unique_ptr<Cell> PRN_complier::eval(const Row &cur_row) const
 {
     if (PRN_tokens.empty())
         return nullptr;
-    std::vector<std::shared_ptr<Token>> cur_stack = PRN_tokens;
+    std::vector<std::shared_ptr<Token>> cur_stack;
+
     for (int i = 0; i < cur_stack.size(); i++)
     {
         if (cur_stack[i]->type == Token::Token_types::String)
@@ -32,15 +33,24 @@ std::unique_ptr<Cell> PRN_complier::eval(const Row &cur_row) const
             cur_stack[i] = std::make_shared<VarToken>(cur_row, std::dynamic_pointer_cast<StrToken>(cur_stack[i]));
         }
     }
-    while (cur_stack.size() != 1 && cur_stack.back()->type != Token::Token_types::Variable)
+    for (auto i : PRN_tokens)
     {
-        cur_stack.push_back(std::make_shared<VarToken>(std::dynamic_pointer_cast<OpToken>(cur_stack.back())->apply(cur_stack)));
+        if (i->type == Token::Token_types::String)
+        {
+            cur_stack.emplace_back(std::make_shared<VarToken>(cur_row, std::dynamic_pointer_cast<StrToken>(i)));
+        }
+        else
+        {
+            cur_stack.emplace_back(i);
+            cur_stack.push_back(
+                std::make_shared<VarToken>(std::dynamic_pointer_cast<OpToken>(cur_stack.back())->apply(cur_stack)));
+        }
     }
+
     if (cur_stack.size() != 1)
     {
         throw std::runtime_error("Condition: stack size is not 1");
     }
 
     return std::dynamic_pointer_cast<VarToken>(cur_stack.back())->value->clone();
-
 }
