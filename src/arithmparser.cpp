@@ -193,7 +193,8 @@ std::vector<std::shared_ptr<Token>> ArithmParser::arithm_parse(std::string origi
         else
         {
             while (!op_stack.empty() &&
-                   operations_precedence[cur_token->type] >= operations_precedence[op_stack.back()->type])
+                   (op_stack.back()->type != Token::Token_types::Par_left &&
+                    operations_precedence[cur_token->type] >= operations_precedence[op_stack.back()->type]))
             {
                 output.emplace_back(op_stack.back());
                 op_stack.pop_back();
