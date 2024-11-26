@@ -35,6 +35,14 @@ void ArithmParser::rec_parse(const std::string &str, ArithmParser::Order_type cu
 {
     if (left >= right)
         return;
+        
+    while (std::isspace(static_cast<unsigned char>(str[left])) && left <= right)
+        left++;
+    if (left > right)
+        return ;
+    while (std::isspace(static_cast<unsigned char>(str[right])))
+        right--;
+    
     int cur_start = left;
     int next = left;
     switch (cur_token)
