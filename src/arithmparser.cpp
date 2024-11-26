@@ -170,15 +170,9 @@ std::vector<std::shared_ptr<Token>> ArithmParser::arithm_parse(std::string origi
     // https://en.wikipedia.org/wiki/Shunting_yard_algorithm
     for (std::shared_ptr<Token> &cur_token : input)
     {
-        if (cur_token->type != Token::Token_types::String)
+        if (cur_token->type == Token::Token_types::String)
         {
-            while (!op_stack.empty() &&
-                   operations_precedence[cur_token->type] >= operations_precedence[op_stack.back()->type])
-            {
-                output.emplace_back(op_stack.back());
-                op_stack.pop_back();
-            }
-            op_stack.emplace_back(cur_token);
+            output.emplace_back(cur_token);
         }
         else if (cur_token->type == Token::Token_types::Par_left)
         {
@@ -198,7 +192,13 @@ std::vector<std::shared_ptr<Token>> ArithmParser::arithm_parse(std::string origi
         }
         else
         {
-            output.emplace_back(cur_token);
+            while (!op_stack.empty() &&
+                   operations_precedence[cur_token->type] >= operations_precedence[op_stack.back()->type])
+            {
+                output.emplace_back(op_stack.back());
+                op_stack.pop_back();
+            }
+            op_stack.emplace_back(cur_token);
         }
     }
     while (!op_stack.empty())
