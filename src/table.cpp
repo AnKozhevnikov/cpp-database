@@ -10,7 +10,7 @@
 
 Table Table::insert(std::vector<std::optional<std::any>> row)
 {
-    Row nRow(columns);
+    Row nRow(&columns);
     nRow.sz = row.size();
     nRow.v.resize(nRow.sz);
     for (auto it : columns)
@@ -128,7 +128,7 @@ void Table::load(std::string path)
     while (std::getline(tstream, line))
     {
         std::stringstream ss(line);
-        Row nRow(columns);
+        Row nRow(&columns);
         nRow.sz = columns.size();
         nRow.v.resize(nRow.sz);
         for (int i = 0; i < nRow.sz; i++)
@@ -171,7 +171,7 @@ Table Table::select(std::vector<std::string> cols, Condition &cond)
             continue;
         }
 
-        Row nRow(columns);
+        Row nRow(&ret.columns);
         nRow.sz = cols.size();
         nRow.v.resize(nRow.sz);
         for (int i = 0; i < cols.size(); i++)
@@ -181,7 +181,7 @@ Table Table::select(std::vector<std::string> cols, Condition &cond)
         ret.rows.emplace_back(std::move(nRow));
     }
 
-    return ret;
+    return std::move(ret);
 }
 
 Table Table::deleteRows(Condition &cond)
