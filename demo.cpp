@@ -10,7 +10,7 @@ int main()
     //db.save("db");
     for (auto &it : response)
     {
-        int s = it.get<int>("c2");
+        std::string s = it.get<std::string>("c3");
         std::cout << s << std::endl;
     }
     return 0;

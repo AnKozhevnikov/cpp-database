@@ -103,6 +103,8 @@ class Table
     }
 
     Table insert(std::vector<std::optional<std::any>> row);
+    Table insertArr(std::vector<std::optional<std::string>> row);
+    Table insertMap(std::map<std::string, std::string> row);
     Table select(std::vector<std::string> columns, Condition &cond);
     Table deleteRows(Condition &cond);
     Table update(std::string allexpr, std::string cond);
