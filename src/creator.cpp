@@ -21,14 +21,14 @@ std::unique_ptr<Cell> Creator::generateCell(std::shared_ptr<ValueType> vtype, st
     }
 }
 
-std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype, std::string s)
+std::any Creator::generateValue(std::shared_ptr<ValueType> vtype, std::string s)
 {
     switch (vtype->type)
     {
     case Int:
         return std::stoi(s);
     case Bool:
-        return s == "1" || s == "True";
+        return s == "true" || s == "True";
     case String:
         if (s[0] == '\"' && s.back() == '\"')
         {
@@ -46,13 +46,13 @@ std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype,
             s = s.substr(2);
             if (s.size() % 2 != 0)
             {
-                throw std::invalid_argument("Invalid bytearray");
+                throw std::invalid_argument("Invalid bytearray size");
             }
             for (int i = 0; i < s.size(); i += 2)
             {
                 if (!((s[i] >= '0' && s[i] <= '9') || (s[i] >= 'a' && s[i] <= 'f')))
                 {
-                    throw std::invalid_argument("Invalid bytearray");
+                    throw std::invalid_argument("Invalid bytearray value");
                 }
                 int c1 = s[i] >= '0' && s[i] <= '9' ? s[i] - '0' : s[i] - 'a' + 10;
                 int c2 = s[i + 1] >= '0' && s[i + 1] <= '9' ? s[i + 1] - '0' : s[i + 1] - 'a' + 10;
@@ -64,7 +64,7 @@ std::optional<std::any> Creator::generateValue(std::shared_ptr<ValueType> vtype,
             s = s.substr(1, s.size() - 2);
             for (char c : s)
             {
-                if (c < '0' || c > '8')
+                if (c < '0' || c > '7')
                 {
                     throw std::invalid_argument("Invalid bytearray");
                 }
@@ -116,6 +116,14 @@ std::shared_ptr<ValueType> Creator::generateValueType(std::string s)
     }
     else if (s == "bytearray" || s == "ByteArray")
     {
+        if (args == "")
+        {
+            throw std::invalid_argument("Invalid bytearray size");
+        }
+        if (std::stoi(args) <= 0)
+        {
+            throw std::invalid_argument("Invalid bytearray size");
+        }
         return std::make_shared<ByteArrayType>(std::stoi(args));
     }
     else
@@ -136,9 +144,9 @@ std::unique_ptr<Cell> Creator::cellFromRawString(std::string s)
     }
     else
     {
-        if (s == "True" || s == "False")
+        if (s == "True" || s == "False" || s == "true" || s == "false")
         {
-            return std::make_unique<BoolCell>(s == "True");
+            return std::make_unique<BoolCell>(s == "True" || s == "true");
         }
 
         if (s.size() >= 2 && s[0] == '0' && s[1] == 'x')
@@ -150,14 +158,24 @@ std::unique_ptr<Cell> Creator::cellFromRawString(std::string s)
         bool isInt = true;
         for (int i = 0; i < s.size(); ++i)
         {
+            if (s[i] == '-' && i == 0)
+            {
+                continue;
+            }
             if (s[i] < '0' || s[i] > '9')
             {
                 isInt = false;
                 break;
             }
         }
-        if (isInt) {
+        if (isInt)
+        {
             return generateCell(std::make_shared<ValueType>(Int), std::stoi(s));
+        }
+
+        if (s[0] == '\"' && s.back() == '\"')
+        {
+            return generateCell(std::make_shared<ValueType>(String), s.substr(1, s.size() - 2));
         }
 
         throw std::invalid_argument("Unknown type");
@@ -176,23 +194,6 @@ std::string Creator::stringFromValueType(std::shared_ptr<ValueType> vtype)
         return "string";
     case ByteArray:
         return "bytearray[" + std::to_string(std::dynamic_pointer_cast<ByteArrayType>(vtype)->size) + "]";
-    default:
-        throw std::invalid_argument("Invalid type");
-    }
-}
-
-std::any Creator::valFromCell(std::shared_ptr<ValueType> vtype, const std::unique_ptr<Cell> &cell)
-{
-    switch (vtype->type)
-    {
-    case Int:
-        return dynamic_cast<IntCell &>(*cell).value;
-    case Bool:
-        return dynamic_cast<BoolCell &>(*cell).value;
-    case String:
-        return dynamic_cast<StringCell &>(*cell).value;
-    case ByteArray:
-        return dynamic_cast<ByteArrayCell &>(*cell).value;
     default:
         throw std::invalid_argument("Invalid type");
     }

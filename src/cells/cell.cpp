@@ -89,3 +89,8 @@ std::unique_ptr<Cell> Cell::opAbs() const
 {
     throw std::runtime_error("This operation is not implemented");
 }
+
+std::any Cell::getValue() const
+{
+    throw std::runtime_error("This operation is not implemented");
+}

@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <any>
 
 class Cell
 {
@@ -31,6 +32,8 @@ class Cell
     virtual std::unique_ptr<Cell> opNot() const;
     virtual std::unique_ptr<Cell> opXor(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opAbs() const;
+
+    virtual std::any getValue() const;
 };
 
 class IntCell : public Cell
@@ -38,9 +41,6 @@ class IntCell : public Cell
   public:
     virtual std::unique_ptr<Cell> clone();
     virtual std::string toString();
-    IntCell(std::string s) : value(std::stoi(s))
-    {
-    }
 
     IntCell(int v) : value(v)
     {
@@ -57,6 +57,8 @@ class IntCell : public Cell
     virtual std::unique_ptr<Cell> opGeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
+
+    virtual std::any getValue() const;
     int value;
 };
 
@@ -65,9 +67,6 @@ class BoolCell : public Cell
   public:
     virtual std::unique_ptr<Cell> clone();
     virtual std::string toString();
-    BoolCell(std::string s) : value(s == "1")
-    {
-    }
 
     BoolCell(bool v) : value(v)
     {
@@ -81,6 +80,8 @@ class BoolCell : public Cell
     virtual std::unique_ptr<Cell> opOr(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opAnd(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNot() const;
+
+    virtual std::any getValue() const;
     bool value;
 };
 
@@ -101,6 +102,8 @@ class StringCell : public Cell
     virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opAbs() const;
+
+    virtual std::any getValue() const;
     std::string value;
 };
 
@@ -109,7 +112,6 @@ class ByteArrayCell : public Cell
   public:
     virtual std::unique_ptr<Cell> clone();
     virtual std::string toString();
-    ByteArrayCell(std::string s);
 
     ByteArrayCell(std::vector<int8_t> v) : value(v)
     {
@@ -122,5 +124,7 @@ class ByteArrayCell : public Cell
     virtual std::unique_ptr<Cell> opLeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opAbs() const;
+
+    virtual std::any getValue() const;
     std::vector<int8_t> value;
 };

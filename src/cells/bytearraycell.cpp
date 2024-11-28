@@ -7,14 +7,6 @@
 // 2. Different sz == different byte arrays and no leading zeros
 // 3. BigEndian
 
-ByteArrayCell::ByteArrayCell(std::string s)
-{
-    for (size_t i = 0; i != s.size(); i++)
-    {
-        value.push_back(s[i]-'0');
-    }
-}
-
 std::string ByteArrayCell::toString()
 {
     std::string ret;
@@ -75,4 +67,9 @@ std::unique_ptr<Cell> ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) c
 std::unique_ptr<Cell> ByteArrayCell::opAbs() const
 {
     return std::make_unique<IntCell>(value.size());
+}
+
+std::any ByteArrayCell::getValue() const
+{
+    return value;
 }

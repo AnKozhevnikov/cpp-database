@@ -43,7 +43,7 @@ Table Table::insertArr(std::vector<std::optional<std::string>> row)
         }
         else
         {
-            nCell = Creator::generateCell(vt, Creator::generateValue(vt, row[i].value()).value());
+            nCell = Creator::generateCell(vt, Creator::generateValue(vt, row[i].value()));
         }
         nRow.v[i] = std::move(nCell);
     }
@@ -85,7 +85,7 @@ Table Table::insertMap(std::map<std::string, std::string> row)
         }
         else
         {
-            nCell = creator.generateCell(vt, creator.generateValue(vt, row[columnName]).value());
+            nCell = creator.generateCell(vt, creator.generateValue(vt, row[columnName]));
         }
 
         nRow.v[num] = std::move(nCell);
@@ -183,7 +183,7 @@ void Table::load(std::string path)
             std::getline(ss, cell, separator);
             Creator creator;
             nRow.v[i] = creator.generateCell(columns[columnOrder[i]].vtype,
-                                             creator.generateValue(columns[columnOrder[i]].vtype, cell).value());
+                                             creator.generateValue(columns[columnOrder[i]].vtype, cell));
         }
         rows.emplace_back(std::move(nRow));
     }

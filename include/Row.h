@@ -23,7 +23,7 @@ class Row
     template <typename T>
     T get(std::string name) const
     {
-        return std::any_cast<T>(Creator::valFromCell((*columns)[name].vtype, v[(*columns)[name].number]));
+        return std::any_cast<T>(v[getPos(name)]->getValue());
     }
 
     Row(const Row &other) = delete;                 // Disable copy constructor

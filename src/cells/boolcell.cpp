@@ -7,11 +7,11 @@ std::string BoolCell::toString()
     std::string ret;
     if (value)
     {
-        ret = "1";
+        ret = "True";
     }
     else
     {
-        ret = "0";
+        ret = "False";
     }
     return ret;
 }
@@ -64,4 +64,9 @@ std::unique_ptr<Cell> BoolCell::opAnd(const std::unique_ptr<Cell> &right) const
 std::unique_ptr<Cell> BoolCell::opNot() const
 {
     return std::make_unique<BoolCell>(!value);
+}
+
+std::any BoolCell::getValue() const
+{
+    return value;
 }

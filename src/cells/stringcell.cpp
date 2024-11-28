@@ -51,3 +51,8 @@ std::unique_ptr<Cell> StringCell::opAbs() const
 {
     return std::make_unique<IntCell>(value.length());
 }
+
+std::any StringCell::getValue() const
+{
+    return value;
+}

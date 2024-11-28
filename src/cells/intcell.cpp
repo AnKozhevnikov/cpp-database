@@ -68,4 +68,7 @@ std::unique_ptr<Cell> IntCell::opNeq(const std::unique_ptr<Cell> &right) const
     return std::make_unique<BoolCell>(value != dynamic_cast<const IntCell &>(*right).value);
 }
 
-
+std::any IntCell::getValue() const
+{
+    return value;
+}
