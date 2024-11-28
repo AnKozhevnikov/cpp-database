@@ -66,6 +66,11 @@ std::unique_ptr<Cell> BoolCell::opNot() const
     return std::make_unique<BoolCell>(!value);
 }
 
+std::unique_ptr<Cell> BoolCell::opXor(const std::unique_ptr<Cell> &right) const
+{
+    return std::make_unique<BoolCell>(value ^ dynamic_cast<const BoolCell &>(*right).value);
+}
+
 std::any BoolCell::getValue() const
 {
     return value;

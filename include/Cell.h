@@ -79,6 +79,7 @@ class BoolCell : public Cell
     virtual std::unique_ptr<Cell> opNeq(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opOr(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opAnd(const std::unique_ptr<Cell> &right) const;
+    virtual std::unique_ptr<Cell> opXor(const std::unique_ptr<Cell> &right) const;
     virtual std::unique_ptr<Cell> opNot() const;
 
     virtual std::any getValue() const;

@@ -46,22 +46,46 @@ std::unique_ptr<Cell> ByteArrayCell::opG(const std::unique_ptr<Cell> &right) con
 
 std::unique_ptr<Cell> ByteArrayCell::opL(const std::unique_ptr<Cell> &right) const
 {
-    return std::make_unique<BoolCell>(!opG(right) && !opEq(right));
+    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    for (size_t i = 0; i != right_value.size(); i++)
+    {
+        if (value[i] != right_value[i])
+            return std::make_unique<BoolCell>(value[i] < right_value[i]);
+    }
+    return std::make_unique<BoolCell>(false);
 }
 
 std::unique_ptr<Cell> ByteArrayCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
-    return std::make_unique<BoolCell>(opG(right) || opEq(right));
+    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    for (size_t i = 0; i != right_value.size(); i++)
+    {
+        if (value[i] != right_value[i])
+            return std::make_unique<BoolCell>(value[i] >= right_value[i]);
+    }
+    return std::make_unique<BoolCell>(true);
 }
 
 std::unique_ptr<Cell> ByteArrayCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
-    return std::make_unique<BoolCell>(!opG(right));
+    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    for (size_t i = 0; i != right_value.size(); i++)
+    {
+        if (value[i] != right_value[i])
+            return std::make_unique<BoolCell>(value[i] <= right_value[i]);
+    }
+    return std::make_unique<BoolCell>(true);
 }
 
 std::unique_ptr<Cell> ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
-    return std::make_unique<BoolCell>(!opEq(right));
+    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    for (size_t i = 0; i != right_value.size(); i++)
+    {
+        if (value[i] != right_value[i])
+            return std::make_unique<BoolCell>(true);
+    }
+    return std::make_unique<BoolCell>(false);
 }
 
 std::unique_ptr<Cell> ByteArrayCell::opAbs() const

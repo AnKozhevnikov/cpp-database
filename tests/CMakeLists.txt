@@ -21,3 +21,4 @@ function(test_case NAME)
 endfunction()
 
 test_case(read_value_test)
+test_case(cell_ops_test)
