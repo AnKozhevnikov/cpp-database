@@ -104,10 +104,20 @@ class Table
         return status;
     }
 
+    std::vector<std::string> getColumns()
+    {
+        std::vector<std::string> ret;
+        for (auto &it : columnOrder)
+        {
+            ret.push_back(it.second);
+        }
+        return ret;
+    }
+
     Table insertArr(std::vector<std::optional<std::string>> row);
     Table insertMap(std::map<std::string, std::string> row);
-    Table select(std::vector<std::string> columns, Condition &cond);
-    Table deleteRows(Condition &cond);
+    Table select(std::vector<std::string> columns, std::string cond);
+    Table deleteRows(std::string cond);
     Table update(std::string allexpr, std::string cond);
     void save(std::string path);
     void load(std::string path);

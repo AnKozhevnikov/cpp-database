@@ -190,7 +190,7 @@ void Table::load(std::string path)
     tstream.close();
 }
 
-Table Table::select(std::vector<std::string> cols, Condition &cond)
+Table Table::select(std::vector<std::string> cols, std::string cond)
 {
     Table res(false);
     for (auto it : cols)
@@ -210,9 +210,10 @@ Table Table::select(std::vector<std::string> cols, Condition &cond)
         ret.columns[cols[i]].number = i;
     }
 
+    Condition condition(cond);
     for (auto &it : rows)
     {
-        bool flag = cond.apply(it);
+        bool flag = condition.apply(it);
         if (!flag)
         {
             continue;
@@ -231,17 +232,18 @@ Table Table::select(std::vector<std::string> cols, Condition &cond)
     return std::move(ret);
 }
 
-Table Table::deleteRows(Condition &cond)
+Table Table::deleteRows(std::string cond)
 {
     Table ret(true);
     ret.name = name;
     ret.columns = columns;
     ret.columnOrder = columnOrder;
 
+    Condition condition(cond);
     auto it = rows.begin();
     while (it != rows.end())
     {
-        bool flag = cond.apply(*it);
+        bool flag = condition.apply(*it);
         if (flag)
         {
             auto itSwap = it;

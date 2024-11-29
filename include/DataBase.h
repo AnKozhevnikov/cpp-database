@@ -24,8 +24,8 @@ class DataBase
     Table createTable(std::string s, std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> info);
     Table insertArr(std::string s, std::vector<std::optional<std::string>> row);
     Table insertMap(std::string s, std::map<std::string, std::string> row);
-    Table select(std::string s, std::vector<std::string> cols, Condition &cond);
-    Table deleteRows(std::string s, Condition &cond);
+    Table select(std::string s, std::vector<std::string> cols, std::string cond);
+    Table deleteRows(std::string s, std::string cond);
     Table update(std::string s, std::string allexpr, std::string cond);
 
   public:
