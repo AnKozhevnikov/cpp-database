@@ -120,6 +120,7 @@ class Table
     Table deleteRows(std::string cond);
     Table update(std::string allexpr, std::string cond);
     Table join(Table &other, std::string cond);
+    Table createIndex(std::string col);
     void save(std::string path);
     void load(std::string path);
 

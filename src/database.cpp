@@ -157,3 +157,14 @@ Table DataBase::join(std::string s1, std::string s2, std::string cond)
 
     return tables[s1].join(tables[s2], cond);
 }
+
+Table DataBase::createIndex(std::string s, std::string col)
+{
+    if (tables.find(s) == tables.end())
+    {
+        Table t(false);
+        return t;
+    }
+
+    return tables[s].createIndex(col);
+}

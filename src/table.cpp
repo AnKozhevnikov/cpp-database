@@ -433,3 +433,23 @@ Table Table::join(Table &other, std::string cond)
     ret.status = true;
     return ret;
 }
+
+Table Table::createIndex(std::string col)
+{
+    Table ret(false);
+    if (columns.find(col) == columns.end())
+    {
+        return ret;
+    }
+
+    this->columns[col].data.clear();
+    this->columns[col].attr |= KEY;
+
+    for (auto &it : rows)
+    {
+        columns[col].data.insert(&it.v[columns[col].number]);
+    }
+
+    ret.status = true;
+    return ret;
+}
