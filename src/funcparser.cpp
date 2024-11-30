@@ -121,12 +121,10 @@ Table DataBase::execute(std::string query)
     {
         int where_pos = unquote_find(query, std::string("where"));
         std::string from_table;
-        Condition tmp(std::string(""));
         if (where_pos == -1)
-            return deleteRows(strip(query), tmp);
+            return deleteRows(strip(query), "");
         from_table = strip(query.substr(0, where_pos));
-        tmp = Condition(query.substr(where_pos + 5));
-        return deleteRows(from_table, tmp);
+        return deleteRows(from_table, query.substr(where_pos + 5));
     }
     else if (type_query == "update")
     {
@@ -144,7 +142,6 @@ Table DataBase::execute(std::string query)
         int from_pos = unquote_find(query, std::string("from"));
         int where_pos = unquote_find(query, std::string("where"));
         std::vector<std::string> columns;
-        Condition tmp(std::string(""));
         if (from_pos == -1)
             throw std::runtime_error("FuncParser:: no from in select  found");
         int prev = 0;
@@ -158,10 +155,9 @@ Table DataBase::execute(std::string query)
         columns.emplace_back(strip(query.substr(prev, from_pos - prev)));
         if (where_pos == -1)
         {
-            return select(strip(query.substr(from_pos + 4, where_pos - from_pos - 4)), columns, tmp);
+            return select(strip(query.substr(from_pos + 4, where_pos - from_pos - 4)), columns, "");
         }
-        tmp = Condition(query.substr(where_pos + 5));
-        return select(strip(query.substr(from_pos + 4, where_pos - from_pos - 4)), columns, tmp);
+        return select(strip(query.substr(from_pos + 4, where_pos - from_pos - 4)), columns, query.substr(where_pos + 5));
     }
     else
     {

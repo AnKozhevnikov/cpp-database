@@ -122,6 +122,7 @@ void Table::save(std::string path)
     {
         istream << it2.first << separator << Creator::stringFromValueType(it2.second.vtype) << separator
                 << it2.second.attr << separator << it2.second.number;
+        if (it2.second.baseValue.has_value())
         {
             std::unique_ptr<Cell> nCell = Creator().generateCell(it2.second.vtype, it2.second.baseValue.value());
             istream << separator << nCell->toString();
@@ -155,9 +156,8 @@ void Table::load(std::string path)
         std::getline(ss, buf, separator);
         int number = std::stoi(buf);
 
-        std::getline(ss, buf, separator);
         std::optional<std::any> baseValue = std::nullopt;
-        if (buf != "")
+        if (std::getline(ss, buf, separator))
         {
             baseValue = Creator().generateValue(vtype, buf);
         }
@@ -281,5 +281,57 @@ Table Table::update(std::string allexpr, std::string cond)
     }
 
     Table ret(true);
+    return ret;
+}
+
+Table Table::join(Table &other, std::string cond)
+{
+    Table ret(false);
+    if (other.columns.size() == 0)
+    {
+        return ret;
+    }
+
+    for (auto &it : columns)
+    {
+        ret.columns[it.first] = it.second;
+        ret.columnOrder[it.second.number] = it.first;
+    }
+
+    for (auto &it : other.columns)
+    {
+        if (ret.columns.find(it.first) != ret.columns.end())
+        {
+            return ret;
+        }
+        ret.columns[it.first] = it.second;
+        ret.columns[it.first].number = this->columns.size() + it.second.number;
+        ret.columnOrder[this->columns.size() + it.second.number] = it.first;
+    }
+
+    Condition condition(cond);
+    for (auto &it1 : rows)
+    {
+        for (auto &it2 : other.rows)
+        {
+            Row nRow(&ret.columns);
+            nRow.sz = ret.columns.size();
+            for (auto &it : it1.v)
+            {
+                nRow.v.push_back(it->clone());
+            }
+            for (auto &it : it2.v)
+            {
+                nRow.v.push_back(it->clone());
+            }
+            nRow.v.shrink_to_fit();
+            if (condition.apply(nRow))
+            {
+                ret.rows.emplace_back(std::move(nRow));
+            }
+        }
+    }
+
+    ret.status = true;
     return ret;
 }

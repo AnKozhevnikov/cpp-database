@@ -489,108 +489,108 @@ TEST(StringOps, Abs)
 
 TEST(ByteArrayOps, G)
 {
-    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c3 = c1->opG(c2);
     EXPECT_EQ(std::any_cast<bool>(c3->getValue()), false);
 
-    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
-    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
+    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c6 = c4->opG(c5);
     EXPECT_EQ(std::any_cast<bool>(c6->getValue()), true);
 
-    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c9 = c7->opG(c8);
     EXPECT_EQ(std::any_cast<bool>(c9->getValue()), false);
 }
 
 TEST(ByteArrayOps, L)
 {
-    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c3 = c1->opL(c2);
     EXPECT_EQ(std::any_cast<bool>(c3->getValue()), true);
 
-    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
-    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
+    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c6 = c4->opL(c5);
     EXPECT_EQ(std::any_cast<bool>(c6->getValue()), false);
 
-    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c9 = c7->opL(c8);
     EXPECT_EQ(std::any_cast<bool>(c9->getValue()), false);
 }
 
 TEST(ByteArrayOps, Eq)
 {
-    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c3 = c1->opEq(c2);
     EXPECT_EQ(std::any_cast<bool>(c3->getValue()), false);
 
-    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
-    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
+    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c6 = c4->opEq(c5);
     EXPECT_EQ(std::any_cast<bool>(c6->getValue()), true);
 
-    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c9 = c7->opEq(c8);
     EXPECT_EQ(std::any_cast<bool>(c9->getValue()), true);
 }
 
 TEST(ByteArrayOps, Geq)
 {
-    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c3 = c1->opGeq(c2);
     EXPECT_EQ(std::any_cast<bool>(c3->getValue()), false);
 
-    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
-    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
+    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c6 = c4->opGeq(c5);
     EXPECT_EQ(std::any_cast<bool>(c6->getValue()), true);
 
-    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c9 = c7->opGeq(c8);
     EXPECT_EQ(std::any_cast<bool>(c9->getValue()), true);
 }
 
 TEST(ByteArrayOps, Leq)
 {
-    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c3 = c1->opLeq(c2);
     EXPECT_EQ(std::any_cast<bool>(c3->getValue()), true);
 
-    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
-    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
+    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c6 = c4->opLeq(c5);
     EXPECT_EQ(std::any_cast<bool>(c6->getValue()), false);
 
-    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c9 = c7->opLeq(c8);
     EXPECT_EQ(std::any_cast<bool>(c9->getValue()), true);
 }
 
 TEST(ByteArrayOps, Neq)
 {
-    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c1 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c2 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c3 = c1->opNeq(c2);
     EXPECT_EQ(std::any_cast<bool>(c3->getValue()), true);
 
-    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
-    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x01});
+    std::unique_ptr<Cell> c4 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
+    std::unique_ptr<Cell> c5 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x01});
     std::unique_ptr<Cell> c6 = c4->opNeq(c5);
     EXPECT_EQ(std::any_cast<bool>(c6->getValue()), false);
 
-    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
-    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<int8_t>{0x00});
+    std::unique_ptr<Cell> c7 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
+    std::unique_ptr<Cell> c8 = std::make_unique<ByteArrayCell>(std::vector<uint8_t>{0x00});
     std::unique_ptr<Cell> c9 = c7->opNeq(c8);
     EXPECT_EQ(std::any_cast<bool>(c9->getValue()), false);
 }

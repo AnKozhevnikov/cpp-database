@@ -15,7 +15,7 @@ std::unique_ptr<Cell> Creator::generateCell(std::shared_ptr<ValueType> vtype, st
     case String:
         return std::make_unique<StringCell>(std::any_cast<std::string>(arg));
     case ByteArray:
-        return std::make_unique<ByteArrayCell>(std::any_cast<std::vector<int8_t>>(arg));
+        return std::make_unique<ByteArrayCell>(std::any_cast<std::vector<uint8_t>>(arg));
     default:
         throw std::invalid_argument("Invalid type");
     }
@@ -40,7 +40,7 @@ std::any Creator::generateValue(std::shared_ptr<ValueType> vtype, std::string s)
         }
         return s;
     case ByteArray: {
-        std::vector<int8_t> v;
+        std::vector<uint8_t> v;
         if (s.size() > 2 && s[0] == '0' && s[1] == 'x')
         {
             s = s.substr(2);

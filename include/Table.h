@@ -119,6 +119,7 @@ class Table
     Table select(std::vector<std::string> columns, std::string cond);
     Table deleteRows(std::string cond);
     Table update(std::string allexpr, std::string cond);
+    Table join(Table &other, std::string cond);
     void save(std::string path);
     void load(std::string path);
 

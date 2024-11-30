@@ -114,7 +114,7 @@ class ByteArrayCell : public Cell
     virtual std::unique_ptr<Cell> clone();
     virtual std::string toString();
 
-    ByteArrayCell(std::vector<int8_t> v) : value(v)
+    ByteArrayCell(std::vector<uint8_t> v) : value(v)
     {
     }
 
@@ -127,5 +127,5 @@ class ByteArrayCell : public Cell
     virtual std::unique_ptr<Cell> opAbs() const;
 
     virtual std::any getValue() const;
-    std::vector<int8_t> value;
+    std::vector<uint8_t> value;
 };

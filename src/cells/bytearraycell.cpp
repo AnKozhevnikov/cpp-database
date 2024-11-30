@@ -10,7 +10,7 @@
 std::string ByteArrayCell::toString()
 {
     std::string ret;
-    for (int8_t byte : value)
+    for (uint8_t byte : value)
     {
         ret += std::to_string(byte);
     }
@@ -24,7 +24,7 @@ std::unique_ptr<Cell> ByteArrayCell::clone()
 
 std::unique_ptr<Cell> ByteArrayCell::opEq(const std::unique_ptr<Cell> &right) const
 {
-    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    const std::vector<uint8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])
@@ -35,7 +35,7 @@ std::unique_ptr<Cell> ByteArrayCell::opEq(const std::unique_ptr<Cell> &right) co
 
 std::unique_ptr<Cell> ByteArrayCell::opG(const std::unique_ptr<Cell> &right) const
 {
-    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    const std::vector<uint8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])
@@ -46,7 +46,7 @@ std::unique_ptr<Cell> ByteArrayCell::opG(const std::unique_ptr<Cell> &right) con
 
 std::unique_ptr<Cell> ByteArrayCell::opL(const std::unique_ptr<Cell> &right) const
 {
-    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    const std::vector<uint8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])
@@ -57,7 +57,7 @@ std::unique_ptr<Cell> ByteArrayCell::opL(const std::unique_ptr<Cell> &right) con
 
 std::unique_ptr<Cell> ByteArrayCell::opGeq(const std::unique_ptr<Cell> &right) const
 {
-    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    const std::vector<uint8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])
@@ -68,7 +68,7 @@ std::unique_ptr<Cell> ByteArrayCell::opGeq(const std::unique_ptr<Cell> &right) c
 
 std::unique_ptr<Cell> ByteArrayCell::opLeq(const std::unique_ptr<Cell> &right) const
 {
-    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    const std::vector<uint8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])
@@ -79,7 +79,7 @@ std::unique_ptr<Cell> ByteArrayCell::opLeq(const std::unique_ptr<Cell> &right) c
 
 std::unique_ptr<Cell> ByteArrayCell::opNeq(const std::unique_ptr<Cell> &right) const
 {
-    const std::vector<int8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
+    const std::vector<uint8_t> &right_value = dynamic_cast<const ByteArrayCell &>(*right).value;
     for (size_t i = 0; i != right_value.size(); i++)
     {
         if (value[i] != right_value[i])

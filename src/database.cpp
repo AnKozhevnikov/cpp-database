@@ -146,3 +146,14 @@ Table DataBase::update(std::string s, std::string allexpr, std::string cond)
 
     return tables[s].update(allexpr, cond);
 }
+
+Table DataBase::join(std::string s1, std::string s2, std::string cond)
+{
+    if (tables.find(s1) == tables.end() || tables.find(s2) == tables.end())
+    {
+        Table t(false);
+        return t;
+    }
+
+    return tables[s1].join(tables[s2], cond);
+}
