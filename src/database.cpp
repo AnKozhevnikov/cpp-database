@@ -112,7 +112,7 @@ void DataBase::load(std::string path)
     }
 }
 
-Table DataBase::select(std::string s, std::vector<std::string> cols, Condition &cond)
+Table DataBase::select(std::string s, std::vector<std::string> cols, std::string cond)
 {
     if (tables.find(s) == tables.end())
     {
@@ -125,7 +125,7 @@ Table DataBase::select(std::string s, std::vector<std::string> cols, Condition &
     return std::move(ret);
 }
 
-Table DataBase::deleteRows(std::string s, Condition &cond)
+Table DataBase::deleteRows(std::string s, std::string cond)
 {
     if (tables.find(s) == tables.end())
     {
