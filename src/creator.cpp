@@ -41,7 +41,7 @@ std::any Creator::generateValue(std::shared_ptr<ValueType> vtype, std::string s)
         return s;
     case ByteArray: {
         std::vector<uint8_t> v;
-        if (s.size() > 2 && s[0] == '0' && s[1] == 'x')
+        if (s.size() >= 2 && s[0] == '0' && s[1] == 'x')
         {
             s = s.substr(2);
             if (s.size() % 2 != 0)
@@ -57,18 +57,6 @@ std::any Creator::generateValue(std::shared_ptr<ValueType> vtype, std::string s)
                 int c1 = s[i] >= '0' && s[i] <= '9' ? s[i] - '0' : s[i] - 'a' + 10;
                 int c2 = s[i + 1] >= '0' && s[i + 1] <= '9' ? s[i + 1] - '0' : s[i + 1] - 'a' + 10;
                 v.push_back(c1 * 16 + c2);
-            }
-        }
-        else if (s[0] == '\"' && s.back() == '\"')
-        {
-            s = s.substr(1, s.size() - 2);
-            for (char c : s)
-            {
-                if (c < '0' || c > '7')
-                {
-                    throw std::invalid_argument("Invalid bytearray");
-                }
-                v.push_back(c - '0');
             }
         }
         else

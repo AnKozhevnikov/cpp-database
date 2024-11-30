@@ -52,28 +52,28 @@ TEST(ReadRawNoType, String)
 TEST(ReadRawNoType, ByteArray)
 {
     std::unique_ptr<Cell> c1 = Creator::cellFromRawString("0x00");
-    std::vector<int8_t> v1 = {0};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c1->getValue()), v1);
+    std::vector<uint8_t> v1 = {0};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c1->getValue()), v1);
 
     std::unique_ptr<Cell> c2 = Creator::cellFromRawString("0x01");
-    std::vector<int8_t> v2 = {1};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c2->getValue()), v2);
+    std::vector<uint8_t> v2 = {1};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c2->getValue()), v2);
 
     std::unique_ptr<Cell> c3 = Creator::cellFromRawString("0x10");
-    std::vector<int8_t> v3 = {16};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c3->getValue()), v3);
+    std::vector<uint8_t> v3 = {16};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c3->getValue()), v3);
 
     std::unique_ptr<Cell> c4 = Creator::cellFromRawString("0x0f");
-    std::vector<int8_t> v4 = {15};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c4->getValue()), v4);
+    std::vector<uint8_t> v4 = {15};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c4->getValue()), v4);
 
     std::unique_ptr<Cell> c5 = Creator::cellFromRawString("0x0a0b0c0d");
-    std::vector<int8_t> v5 = {10, 11, 12, 13};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c5->getValue()), v5);
+    std::vector<uint8_t> v5 = {10, 11, 12, 13};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c5->getValue()), v5);
 
     std::unique_ptr<Cell> c6 = Creator::cellFromRawString("0x0a0b0c0d0e0f");
-    std::vector<int8_t> v6 = {10, 11, 12, 13, 14, 15};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c6->getValue()), v6);
+    std::vector<uint8_t> v6 = {10, 11, 12, 13, 14, 15};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c6->getValue()), v6);
 }
 
 TEST(ReadRawWithType, Int)
@@ -127,33 +127,26 @@ TEST(ReadRawWithType, String)
 TEST(ReadRawWithType, ByteArray0x)
 {
     std::unique_ptr<Cell> c1 = Creator::cellFromRawString("(ByteArray[1])0x00");
-    std::vector<int8_t> v1 = {0};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c1->getValue()), v1);
+    std::vector<uint8_t> v1 = {0};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c1->getValue()), v1);
 
     std::unique_ptr<Cell> c2 = Creator::cellFromRawString("(bytearray[1])0x01");
-    std::vector<int8_t> v2 = {1};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c2->getValue()), v2);
+    std::vector<uint8_t> v2 = {1};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c2->getValue()), v2);
 
     std::unique_ptr<Cell> c3 = Creator::cellFromRawString("(ByteArray[1])0x10");
-    std::vector<int8_t> v3 = {16};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c3->getValue()), v3);
+    std::vector<uint8_t> v3 = {16};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c3->getValue()), v3);
 
     std::unique_ptr<Cell> c4 = Creator::cellFromRawString("(bytearray[1])0x0f");
-    std::vector<int8_t> v4 = {15};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c4->getValue()), v4);
+    std::vector<uint8_t> v4 = {15};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c4->getValue()), v4);
 
     std::unique_ptr<Cell> c5 = Creator::cellFromRawString("(ByteArray[4])0x0a0b0c0d");
-    std::vector<int8_t> v5 = {10, 11, 12, 13};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c5->getValue()), v5);
+    std::vector<uint8_t> v5 = {10, 11, 12, 13};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c5->getValue()), v5);
 
     std::unique_ptr<Cell> c6 = Creator::cellFromRawString("(bytearray[6])0x0a0b0c0d0e0f");
-    std::vector<int8_t> v6 = {10, 11, 12, 13, 14, 15};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c6->getValue()), v6);
-}
-
-TEST(ReadRawWithType, ByteArrayString)
-{
-    std::unique_ptr<Cell> c1 = Creator::cellFromRawString("(ByteArray[3])\"123\"");
-    std::vector<int8_t> v1 = {1, 2, 3};
-    EXPECT_EQ(std::any_cast<std::vector<int8_t>>(c1->getValue()), v1);
+    std::vector<uint8_t> v6 = {10, 11, 12, 13, 14, 15};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c6->getValue()), v6);
 }

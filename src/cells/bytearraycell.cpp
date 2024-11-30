@@ -9,10 +9,13 @@
 
 std::string ByteArrayCell::toString()
 {
-    std::string ret;
-    for (uint8_t byte : value)
+    std::string ret = "0x";
+    for (int i = 0; i < value.size(); i++)
     {
-        ret += std::to_string(byte);
+        int c1 = value[i] / 16;
+        int c2 = value[i] % 16;
+        ret += (c1 < 10 ? '0' + c1 : 'a' + c1 - 10);
+        ret += (c2 < 10 ? '0' + c2 : 'a' + c2 - 10);
     }
     return ret;
 }
