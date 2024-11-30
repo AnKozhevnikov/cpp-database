@@ -48,5 +48,37 @@ int main()
         std::cout << c1 << ' ' << c2 << ' ' << c3 << ' ' << prettybarr(b1) << ' ' << b2 << std::endl;
     }
 
+    std::cout << std::endl;
+
+    response = db.execute("insert (0) to skibidi");
+    if (response.is_ok())
+    {
+        std::cout << "Inserted" << std::endl;
+    }
+    else
+    {
+        std::cout << "Not inserted" << std::endl;
+    }
+
+    response = db.execute("insert (1) to skibidi");
+    if (response.is_ok())
+    {
+        std::cout << "Inserted" << std::endl;
+    }
+    else
+    {
+        std::cout << "Not inserted" << std::endl;
+    }
+
+    response = db.execute("insert (1) to skibidi");
+    if (response.is_ok())
+    {
+        std::cout << "Inserted" << std::endl;
+    }
+    else
+    {
+        std::cout << "Not inserted" << std::endl;
+    }
+
     return 0;
 }
