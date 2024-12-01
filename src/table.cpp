@@ -95,13 +95,15 @@ void Table::load(std::string path)
             Creator creator;
             nRow.v[i] = creator.generateCell(columns[columnOrder[i]].vtype,
                                              creator.generateValue(columns[columnOrder[i]].vtype, cell));
-
-            if ((columns[columnOrder[i]].attr & UNIQUE) != 0 || (columns[columnOrder[i]].attr & KEY) != 0)
-            {
-                columns[columnOrder[i]].data.insert(&nRow.v[i]);
-            }
         }
         rows.emplace_back(std::move(nRow));
+        for (int i = 0; i < nRow.sz; i++)
+        {
+            if ((columns[columnOrder[i]].attr & UNIQUE) != 0 || (columns[columnOrder[i]].attr & KEY) != 0)
+            {
+                columns[columnOrder[i]].data[&rows.back().v[i]].insert(&rows.back());
+            }
+        }
     }
     tstream.close();
 }
@@ -153,7 +155,7 @@ Table Table::insertArr(std::vector<std::optional<std::string>> row)
         {
             if ((it.second.attr & UNIQUE) != 0 || (it.second.attr & KEY) != 0)
             {
-                it.second.data.insert(&rows.back().v[it.second.number]);
+                it.second.data[&rows.back().v[it.second.number]].insert(&rows.back());
             }
             if ((it.second.attr & UNIQUE) != 0 && !it.second.check(&rows.back().v[it.second.number]))
             {
@@ -162,6 +164,10 @@ Table Table::insertArr(std::vector<std::optional<std::string>> row)
                     if ((it1.second.attr & UNIQUE) != 0 || (it1.second.attr & KEY) != 0)
                     {
                         it1.second.data.erase(&rows.back().v[it1.second.number]);
+                        if (it1.second.data[&rows.back().v[it1.second.number]].empty())
+                        {
+                            it1.second.data.erase(&rows.back().v[it1.second.number]);
+                        }
                     }
                 }
                 rows.pop_back();
@@ -224,7 +230,7 @@ Table Table::insertMap(std::map<std::string, std::string> row)
         {
             if ((it.second.attr & UNIQUE) != 0 || (it.second.attr & KEY) != 0)
             {
-                it.second.data.insert(&rows.back().v[it.second.number]);
+                it.second.data[&rows.back().v[it.second.number]].insert(&rows.back());
             }
             if ((it.second.attr & UNIQUE) != 0 && !it.second.check(&rows.back().v[it.second.number]))
             {
@@ -373,8 +379,12 @@ Table Table::update(std::string allexpr, std::string cond)
 
                 if ((columns[expr.updating[i]].attr & UNIQUE) != 0 || (columns[expr.updating[i]].attr & KEY) != 0)
                 {
-                    columns[expr.updating[i]].data.erase(&oldValues[columns[expr.updating[i]].number]);
-                    columns[expr.updating[i]].data.insert(&it.v[columns[expr.updating[i]].number]);
+                    columns[expr.updating[i]].data[&oldValues[columns[expr.updating[i]].number]].erase(&it);
+                    if (columns[expr.updating[i]].data[&oldValues[columns[expr.updating[i]].number]].empty())
+                    {
+                        columns[expr.updating[i]].data.erase(&oldValues[columns[expr.updating[i]].number]);
+                    }
+                    columns[expr.updating[i]].data[&it.v[columns[expr.updating[i]].number]].insert(&it);
 
                     if ((columns[expr.updating[i]].attr & UNIQUE) != 0 &&
                         !columns[expr.updating[i]].check(&it.v[columns[expr.updating[i]].number]))
@@ -383,8 +393,12 @@ Table Table::update(std::string allexpr, std::string cond)
                         {
                             if ((it1.second.attr & UNIQUE) != 0 || (it1.second.attr & KEY) != 0)
                             {
-                                it1.second.data.erase(&it.v[it1.second.number]);
-                                it1.second.data.insert(&oldValues[it1.second.number]);
+                                it1.second.data[&it.v[it1.second.number]].erase(&it);
+                                if (it1.second.data[&it.v[it1.second.number]].empty())
+                                {
+                                    it1.second.data.erase(&it.v[it1.second.number]);
+                                }
+                                it1.second.data[&oldValues[it1.second.number]].insert(&it);
                             }
                         }
 
@@ -458,7 +472,7 @@ Table Table::join(Table &other, std::string cond)
                     {
                         if ((it.second.attr & UNIQUE) != 0 || (it.second.attr & KEY) != 0)
                         {
-                            it.second.data.insert(&ret.rows.back().v[it.second.number]);
+                            it.second.data[&ret.rows.back().v[it.second.number]].insert(&ret.rows.back());
                         }
                         if ((it.second.attr & UNIQUE) != 0 && !it.second.check(&ret.rows.back().v[it.second.number]))
                         {
@@ -497,7 +511,7 @@ Table Table::createIndex(std::string col)
 
         for (auto &it : rows)
         {
-            columns[col].data.insert(&it.v[columns[col].number]);
+            columns[col].data[&it.v[columns[col].number]].insert(&it);
         }
 
         ret.status = true;
