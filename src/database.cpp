@@ -2,34 +2,45 @@
 #include <filesystem>
 #include <set>
 
-Table DataBase::createTable(std::string s,
-                                      std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> info)
+Table DataBase::createTable(
+    std::string s,
+    std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> info)
 {
     if (tables.find(s) != tables.end())
     {
-        Table t(false);
+        Table t(false, "Table already exists");
         return t;
     }
 
-    tables[s].status = true;
-    tables[s].name = s;
-
-    for (int i = 0; i < info.size(); ++i)
+    try
     {
-        std::string columnName = std::get<std::string>(info[i]);
-        tables[s].columns[columnName].number = i;
-        tables[s].columns[columnName].attr = std::get<int>(info[i]);
-        tables[s].columns[columnName].vtype = std::get<std::shared_ptr<ValueType>>(info[i]);
-        if (std::get<std::optional<std::string>>(info[i]).has_value())
-        {
-            tables[s].columns[columnName].baseValue = Creator::generateValue(tables[s].columns[columnName].vtype, std::get<std::optional<std::string>>(info[i]).value());
-        }
-        else
-        {
-            tables[s].columns[columnName].baseValue = std::nullopt;
-        }
+        tables[s].status = true;
+        tables[s].name = s;
 
-        tables[s].columnOrder[i] = columnName;
+        for (int i = 0; i < info.size(); ++i)
+        {
+            std::string columnName = std::get<std::string>(info[i]);
+            tables[s].columns[columnName].number = i;
+            tables[s].columns[columnName].attr = std::get<int>(info[i]);
+            tables[s].columns[columnName].vtype = std::get<std::shared_ptr<ValueType>>(info[i]);
+            if (std::get<std::optional<std::string>>(info[i]).has_value())
+            {
+                tables[s].columns[columnName].baseValue = Creator::generateValue(
+                    tables[s].columns[columnName].vtype, std::get<std::optional<std::string>>(info[i]).value());
+            }
+            else
+            {
+                tables[s].columns[columnName].baseValue = std::nullopt;
+            }
+
+            tables[s].columnOrder[i] = columnName;
+        }
+    }
+    catch (std::exception &e)
+    {
+        tables.erase(s);
+        Table t(false, e.what());
+        return t;
     }
 
     Table t(true);
@@ -40,7 +51,7 @@ Table DataBase::insertArr(std::string s, std::vector<std::optional<std::string>>
 {
     if (tables.find(s) == tables.end() || tables[s].columns.size() != row.size())
     {
-        Table t(false);
+        Table t(false, "Table does not exist or row size does not match");
         return t;
     }
 
@@ -51,7 +62,7 @@ Table DataBase::insertMap(std::string s, std::map<std::string, std::string> row)
 {
     if (tables.find(s) == tables.end() || tables[s].columns.size() != row.size())
     {
-        Table t(false);
+        Table t(false, "Table does not exist or row size does not match");
         return t;
     }
 
@@ -116,7 +127,7 @@ Table DataBase::select(std::string s, std::vector<std::string> cols, std::string
 {
     if (tables.find(s) == tables.end())
     {
-        Table t(false);
+        Table t(false, "Table does not exist");
         return t;
     }
 
@@ -129,7 +140,7 @@ Table DataBase::deleteRows(std::string s, std::string cond)
 {
     if (tables.find(s) == tables.end())
     {
-        Table t(false);
+        Table t(false, "Table does not exist");
         return t;
     }
 
@@ -140,7 +151,7 @@ Table DataBase::update(std::string s, std::string allexpr, std::string cond)
 {
     if (tables.find(s) == tables.end())
     {
-        Table t(false);
+        Table t(false, "Table does not exist");
         return t;
     }
 
@@ -151,7 +162,7 @@ Table DataBase::join(std::string s1, std::string s2, std::string cond)
 {
     if (tables.find(s1) == tables.end() || tables.find(s2) == tables.end())
     {
-        Table t(false);
+        Table t(false, "Table does not exist");
         return t;
     }
 
@@ -162,7 +173,7 @@ Table DataBase::createIndex(std::string s, std::string col)
 {
     if (tables.find(s) == tables.end())
     {
-        Table t(false);
+        Table t(false, "Table does not exist");
         return t;
     }
 

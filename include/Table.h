@@ -1,10 +1,10 @@
 #pragma once
 
+#include <iostream>
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "ColumnInfo.h"
 #include "Condition.h"
@@ -59,7 +59,7 @@ class Table
 {
   public:
     Table() = default;
-    Table(bool s) : status(s), columns(), columnOrder(), rows()
+    Table(bool s, std::string msg = "") : status(s), columns(), columnOrder(), rows(), errorMsg(msg)
     {
     }
 
@@ -74,6 +74,7 @@ class Table
             columnOrder = other.columnOrder;
             name = other.name;
             status = other.status;
+            errorMsg = other.errorMsg;
 
             rows.clear();
             for (auto &it : other.rows)
@@ -86,10 +87,8 @@ class Table
     }
 
     Table(Table &&other)
-        : columns(other.columns),
-          columnOrder(other.columnOrder),
-          name(other.name),
-          status(other.status)
+        : columns(other.columns), columnOrder(other.columnOrder), name(other.name), status(other.status),
+          errorMsg(other.errorMsg)
     {
         rows.clear();
         for (auto &it : other.rows)
@@ -102,6 +101,11 @@ class Table
     bool is_ok()
     {
         return status;
+    }
+
+    std::string what()
+    {
+        return errorMsg;
     }
 
     std::vector<std::string> getColumns()
@@ -142,6 +146,7 @@ class Table
     std::string name;
 
     bool status;
+    std::string errorMsg;
 
     const char separator = '\t';
 

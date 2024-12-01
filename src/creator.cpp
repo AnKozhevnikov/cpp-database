@@ -59,6 +59,13 @@ std::any Creator::generateValue(std::shared_ptr<ValueType> vtype, std::string s)
                 v.push_back(c1 * 16 + c2);
             }
         }
+        else if (s.size() >= 2 && s[0] == '\"' && s.back() == '\"')
+        {
+            for (int i = 1; i < s.size() - 1; ++i)
+            {
+                v.push_back(s[i]);
+            }
+        }
         else
         {
             throw std::invalid_argument("Invalid bytearray");

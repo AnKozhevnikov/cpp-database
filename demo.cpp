@@ -57,7 +57,7 @@ int main()
     }
     else
     {
-        std::cout << "Not inserted" << std::endl;
+        std::cout << response.what() << std::endl;
     }
 
     response = db.execute("insert (1) to skibidi");
@@ -67,7 +67,7 @@ int main()
     }
     else
     {
-        std::cout << "Not inserted" << std::endl;
+        std::cout << response.what() << std::endl;
     }
 
     response = db.execute("insert (1) to skibidi");
@@ -77,7 +77,7 @@ int main()
     }
     else
     {
-        std::cout << "Not inserted" << std::endl;
+        std::cout << response.what() << std::endl;
     }
 
     return 0;

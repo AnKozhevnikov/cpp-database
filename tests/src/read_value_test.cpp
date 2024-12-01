@@ -150,3 +150,14 @@ TEST(ReadRawWithType, ByteArray0x)
     std::vector<uint8_t> v6 = {10, 11, 12, 13, 14, 15};
     EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c6->getValue()), v6);
 }
+
+TEST(ReadRawWithType, ByteArrayString)
+{
+    std::unique_ptr<Cell> c1 = Creator::cellFromRawString("(ByteArray[4])\"0123\"");
+    std::vector<uint8_t> v1 = {48,49,50,51};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c1->getValue()), v1);
+
+    std::unique_ptr<Cell> c2 = Creator::cellFromRawString("(ByteArray[4])\"<=>?\"");
+    std::vector<uint8_t> v2 = {60,61,62,63};
+    EXPECT_EQ(std::any_cast<std::vector<uint8_t>>(c2->getValue()), v2);
+}
