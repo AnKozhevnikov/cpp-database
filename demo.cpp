@@ -80,5 +80,39 @@ int main()
         std::cout << response.what() << std::endl;
     }
 
+    std::cout << std::endl;
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t1{"c1", std::make_shared<ValueType>(Int), std::nullopt, 0};
+    std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> t2{"c2", std::make_shared<ValueType>(Int), std::nullopt, UNIQUE};
+    db.createTable("aaa", {t1, t2});
+    response = db.execute("insert (1,2) to aaa");
+    if (response.is_ok())
+        std::cout << "Inserted" << std::endl;
+    else
+        std::cout << response.what() << std::endl;
+
+    response = db.execute("insert (1,2) to aaa");
+    if (response.is_ok())
+        std::cout << "Inserted" << std::endl;
+    else
+        std::cout << response.what() << std::endl;
+
+    response = db.execute("insert (1,2) to aaa");
+    if (response.is_ok())
+        std::cout << "Inserted" << std::endl;
+    else
+        std::cout << response.what() << std::endl;
+
+    response = db.execute("insert (1,3) to aaa");
+    if (response.is_ok())
+        std::cout << "Inserted" << std::endl;
+    else
+        std::cout << response.what() << std::endl;
+
+    response = db.execute("update aaa set c2=2 where c2=3");
+    if (response.is_ok())
+        std::cout << "Updated" << std::endl;
+    else
+        std::cout << response.what() << std::endl;
+
     return 0;
 }

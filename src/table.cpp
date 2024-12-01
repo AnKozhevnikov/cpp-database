@@ -163,7 +163,7 @@ Table Table::insertArr(std::vector<std::optional<std::string>> row)
                 {
                     if ((it1.second.attr & UNIQUE) != 0 || (it1.second.attr & KEY) != 0)
                     {
-                        it1.second.data.erase(&rows.back().v[it1.second.number]);
+                        it1.second.data[&rows.back().v[it1.second.number]].erase(&rows.back());
                         if (it1.second.data[&rows.back().v[it1.second.number]].empty())
                         {
                             it1.second.data.erase(&rows.back().v[it1.second.number]);
@@ -234,16 +234,18 @@ Table Table::insertMap(std::map<std::string, std::string> row)
             }
             if ((it.second.attr & UNIQUE) != 0 && !it.second.check(&rows.back().v[it.second.number]))
             {
-                rows.pop_back();
-
                 for (auto &it1 : columns)
                 {
                     if ((it1.second.attr & UNIQUE) != 0 || (it1.second.attr & KEY) != 0)
                     {
-                        it1.second.data.erase(&rows.back().v[it1.second.number]);
+                        it1.second.data[&rows.back().v[it1.second.number]].erase(&rows.back());
+                        if (it1.second.data[&rows.back().v[it1.second.number]].empty())
+                        {
+                            it1.second.data.erase(&rows.back().v[it1.second.number]);
+                        }
                     }
                 }
-
+                rows.pop_back();
                 Table tab(false, "Unique constraint violated");
                 return tab;
             }
@@ -371,6 +373,11 @@ Table Table::update(std::string allexpr, std::string cond)
 
             std::vector<std::unique_ptr<Cell>> values = expr.get_values(it);
             std::vector<std::unique_ptr<Cell>> oldValues = std::move(it.v);
+            if (values.size() != oldValues.size())
+            {
+                Table tab(false, "Row size does not match");
+                return tab;
+            }
             it.v.clear();
             it.v.resize(columns.size());
             for (int i = 0; i < values.size(); i++)
@@ -403,7 +410,7 @@ Table Table::update(std::string allexpr, std::string cond)
                         }
 
                         it.v = std::move(oldValues);
-                        Table tab(false);
+                        Table tab(false, "Unique constraint violated");
                         return tab;
                     }
                 }
@@ -425,10 +432,6 @@ Table Table::join(Table &other, std::string cond)
     try
     {
         Table ret(false);
-        if (other.columns.size() == 0)
-        {
-            return ret;
-        }
 
         for (auto &it : columns)
         {
@@ -440,6 +443,7 @@ Table Table::join(Table &other, std::string cond)
         {
             if (ret.columns.find(it.first) != ret.columns.end())
             {
+                Table ret(false, "Column with the same name exists");
                 return ret;
             }
             ret.columns[it.first] = it.second;
@@ -476,7 +480,7 @@ Table Table::join(Table &other, std::string cond)
                         }
                         if ((it.second.attr & UNIQUE) != 0 && !it.second.check(&ret.rows.back().v[it.second.number]))
                         {
-                            Table tab(false);
+                            Table tab(false, "Unique constraint violated");
                             return tab;
                         }
                     }
@@ -503,6 +507,7 @@ Table Table::createIndex(std::string col)
         Table ret(false);
         if (columns.find(col) == columns.end())
         {
+            Table ret(false, "Column does not exist");
             return ret;
         }
 
