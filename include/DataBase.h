@@ -1,5 +1,5 @@
 #pragma once
-
+#include <Funcparser.h>
 #include <any>
 #include <list>
 #include <map>
@@ -22,7 +22,8 @@ class DataBase
 {
   private:
     std::map<std::string, Table> tables;
-
+    mParser lex_parser;
+    Table get_table(int&);
   public:
     Table createTable(
         std::string s,
@@ -34,7 +35,7 @@ class DataBase
     Table update(std::string s, std::string allexpr, std::string cond);
     Table join(std::string s1, std::string s2, std::string cond);
     Table createIndex(std::string s, std::string col);
-
+    
     Table execute(std::string q);
     void save(std::string path);
     void load(std::string path);
