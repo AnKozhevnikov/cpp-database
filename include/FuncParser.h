@@ -1,7 +1,12 @@
+#pragma once
+
 #include <string>
 #include <map>
 #include <vector>
-#include "FlexLexer.h"
+#include <FlexLexer.h>
+#include <memory>
+#include "Types.h"
+#include <optional>
 enum FuncTokenTypes
 {
     open_par,
@@ -27,7 +32,7 @@ enum FuncTokenTypes
     mnext,
     other
 };
-std::vector<FuncToken> mbuffer;
+
 
 
 using FT=FuncTokenTypes;
@@ -39,15 +44,7 @@ using FT=FuncTokenTypes;
 
 static std::map<std::string, FuncTokenTypes> words_to_func  = {f_pair(create), f_pair(update),
 fm_pair(select), f_pair(where), f_pair(from), f_pair(by), fm_pair(set), fm_pair(index), f_pair(join), f_pair(on), fm_pair(delete)};
-class mParser : public yyFlexLexer
-{
-    
-public:
-    mParser();
-    void parse(std::string a);
-private:
-    std::vector<FuncToken> tokens;
-};
+
 
 class FuncToken
 {
@@ -106,6 +103,16 @@ class FuncToken
         }
 };
 
+class mParser : public yyFlexLexer
+{
+    
+public:
+    mParser();
+    void parse(std::string a);
+private:
+    std::vector<FuncToken> tokens;
+};
+
 
 
 
@@ -113,7 +120,7 @@ class FuncToken
 class FinetStateM
 {
     public:
-        FinetStateM(std::vector<FuncToken>& v) : Tokens(v), pos(3) {}
+        FinetStateM(std::vector<FuncToken>& v) : Tokens(v), pos(4) {}
         
         std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> next_col();
         int pars_atr();

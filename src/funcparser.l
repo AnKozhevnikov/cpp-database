@@ -8,8 +8,8 @@
 
     #include <iostream>
     #include <vector>
-    #include "Funcparser.h"
-    extern vector<FuncToken> mbuffer;
+    #include "FuncParser.h"
+    std::vector<FuncToken> mbuffer;
 %}
 
 string  \"[^\n"]+\"
@@ -21,7 +21,9 @@ sp [\t \n]
 %%
 
 {sp}    
-{word} | {spec_sym} | {string}  {mbuffer.emplace(YYText());}
+{word}  mbuffer.emplace_back(yytext);
+{spec_sym} mbuffer.emplace_back(yytext);
+{string}  mbuffer.emplace_back(yytext);
 
 
 
@@ -29,28 +31,65 @@ sp [\t \n]
 
 
 #include "DataBase.h"
-#include "FlexLexer.h"
 #include "FuncParser.h"
 #include "Table.h"
 #include <algorithm>
-#include <fstream>
+#include <sstream>
 #include <memory>
 #include <string>
-
+#include <tuple>
 mParser::mParser() : yyFlexLexer() {};
+static void low_str(std::string &str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::tolower(c); });
+}
 
 void mParser::parse(std::string input)
 {
     mbuffer.clear();
-    istringstream tmp(input + string("\0"));
+    std::istringstream tmp(input + std::string("\0"));
 
-    FlexLexer::yylex(tmp, cout);
+    FlexLexer::yylex(tmp, std::cout);
 }
+static std::tuple<int, std::string, std::string, std::string> get_table(int &start)
+{
+    if (mbuffer[start].type != FT::other)
+    {
+        throw std::runtime_error("No name for left table in join");
+    }
+    if (mbuffer[start + 1].type != FT::join)
+    {
 
+            start++;
+            return make_tuple(0, mbuffer[start - 1].val, std::string(""), std::string(""));
+
+    }
+    else
+    {
+        std::string s1 = mbuffer[start].val;
+        std::string s2 = mbuffer[start + 2].val;
+        std::string cond;
+        start += 3;
+        if (mbuffer[start].type != FT::on)
+        {
+            return make_tuple(1, s1, s2, std::string(""));
+        }
+        else
+        {
+            start++;
+            for (; mbuffer[start].type == FT::other; start++)
+            {
+                cond += mbuffer[start].val;
+            }
+            return make_tuple(1, s1, s2, cond);
+        }
+    }
+}
 // Todo:: implement exepctions
-Table DataBase::execute(string input)
+Table DataBase::execute(std::string input)
 {
     lex_parser.parse(input);
+    std::cout << mbuffer.size() <<std::endl;
     switch (mbuffer[0].type)
     {
     case FT::create: {
@@ -61,11 +100,15 @@ Table DataBase::execute(string input)
         }
 
         FinetStateM mashine(mbuffer);
-        string name = mbuffer[2].val;
+        std::string name = mbuffer[2].val;
         std::vector<std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int>> columns;
 
         while (mbuffer[mashine.pos].type != FT::close_par && mbuffer[mashine.pos].type != FT::mend)
         {
+			if (mbuffer[mashine.pos].type == FT::mnext)
+			{
+				mashine.pos++;
+			}
             try
             {
                 columns.emplace_back(mashine.next_col());
@@ -82,13 +125,13 @@ Table DataBase::execute(string input)
     }
     case FT::update: {
         int pos = 1;
-        Table cur_table = get_table(pos);
+        auto cur_table = get_table(pos);
         if (mbuffer[pos].type != FT::mset)
         {
             throw std::runtime_error("No set found in update");
         }
         pos++;
-        string expr;
+        std::string expr;
         for (; mbuffer[pos].type != FT::where && mbuffer[pos].type != FT::mend; pos++)
         {
             expr += mbuffer[pos].val;
@@ -97,19 +140,27 @@ Table DataBase::execute(string input)
         {
             throw std::runtime_error("No where found in update");
         }
-        string cond;
+        std::string cond;
         for (; mbuffer[pos].type != FT::mend; pos++)
         {
             cond += mbuffer[pos].val;
         }
-        return cur_table.update(expr, cond);
+        if (std::get<0>(cur_table) == 0)
+        {
+            return update(std::get<1>(cur_table), expr, cond);
+        }
+        else
+        {
+            return join(std::get<1>(cur_table), std::get<2>(cur_table), std::get<3>(cur_table)).update(expr, cond);
+        }
+        
 
         break;
     }
     case FT::mdelete: {
-        string cur_table = mbuffer[1].val;
+        std::string cur_table = mbuffer[1].val;
         int pos = 3;
-        string cond;
+        std::string cond;
         for (; mbuffer[pos].type != FT::mend; pos++)
         {
             cond += mbuffer[pos].val;
@@ -123,9 +174,13 @@ Table DataBase::execute(string input)
     case FT::mselect: {
         int pos = 1;
         int get_all = 0;
-        vector<string> col;
+        std::vector<std::string> col;
         for (; mbuffer[pos].type != FT::from && mbuffer[pos].type != FT::mend; pos++)
         {
+			if (mbuffer[pos].type == FT::mnext)
+			{
+				pos++;
+			}
             col.emplace_back(mbuffer[pos].val);
             if (mbuffer[pos].val == "*")
             {
@@ -133,33 +188,57 @@ Table DataBase::execute(string input)
             }
         }
         pos++;
-        Table cur_table = get_table(pos);
-        if (get_all)
-        {
-            col = cur_table.getColumns();
-        }
+        auto response = get_table(pos);
+        
         pos++;
-        string cond;
+        std::string cond;
         for (; mbuffer[pos].type != FT::mend; pos++)
         {
             cond += mbuffer[pos].val;
         }
-        return cur_table.select(col, cond);
+        if (std::get<0>(response) == 0)
+        {
+            if (get_all)
+            {
+                return select(std::get<1>(response), getColumnOfTable(std::get<1>(response)), cond);
+            }
+            else
+            {
+                return select(std::get<1>(response), col, cond);
+            }
+            
+        }
+        else
+        {
+            Table j_table = join(std::get<1>(response), std::get<2>(response), std::get<3>(response));
+            if (get_all)
+            {
+                return j_table.select(j_table.getColumns() , cond);
+            }
+            else
+            {
+                return j_table.select(col , cond);;
+            }
+            
+            
+        }
         break;
     }
     default:
+        return Table(false);
         break;
     }
 }
 
 std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, int> FinetStateM::next_col()
 {
+	std::cout << pos << std::endl;
     int attr = pars_atr();
     if (mbuffer[pos].type != FT::other)
     {
         throw std::runtime_error("No col name");
     }
-    string col_name = mbuffer[pos].val;
+    std::string col_name = mbuffer[pos].val;
     pos++;
     if (mbuffer[pos].type != FT::separator)
     {
@@ -167,7 +246,7 @@ std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, 
     }
     pos++;
     std::shared_ptr<ValueType> column_type = pars_type();
-    optional<string> default_val = nullopt;
+    std::optional<std::string> default_val = std::nullopt;
     if (mbuffer[pos].type == FT::eq)
     {
         pos++;
@@ -176,6 +255,7 @@ std::tuple<std::string, std::shared_ptr<ValueType>, std::optional<std::string>, 
             throw std::runtime_error("Strange default value for column");
         }
         default_val = mbuffer[pos].val;
+		pos++;
     }
     return make_tuple(col_name, column_type, default_val, attr);
 }
@@ -216,45 +296,7 @@ int FinetStateM::pars_atr()
 }
 
 // Todo: implement rec search, exepctions
-Table DataBase::get_table(int &start)
-{
-    if (mbuffer[start].type != FT::other)
-    {
-        throw std::runtime_error("No name for left table in join");
-    }
-    if (mbuffer[start + 1].type != FT::join)
-    {
-        if (tables.find(mbuffer[start + 1].val) == tables.end())
-        {
-            throw std::runtime_error("Table with given name doesnt exists");
-        }
-        else
-        {
-            start++;
-            return tables[mbuffer[start - 1].val];
-        }
-    }
-    else
-    {
-        string s1 = mbuffer[start].val;
-        string s2 = mbuffer[start + 2].val;
-        string cond;
-        start += 3;
-        if (mbuffer[start].type != FT::on)
-        {
-            return join(s1, s2, cond);
-        }
-        else
-        {
-            start++;
-            for (; mbuffer[start].type == FT::other; start++)
-            {
-                cond += mbuffer[start].val;
-            }
-            return join(s1, s2, cond);
-        }
-    }
-}
+
 
 std::shared_ptr<ValueType> FinetStateM::pars_type()
 {
@@ -269,12 +311,12 @@ std::shared_ptr<ValueType> FinetStateM::pars_type()
             mbuffer[pos + 3].type != FT::close_sqr)
             throw std::runtime_error("No sqr brace for string");
         pos += 4;
-        return make_shared<ValueType>(Types::String);
+        return std::make_shared<ValueType>(Types::String);
     }
     else if (mbuffer[pos].val == "int32")
     {
         pos += 1;
-        return make_shared<ValueType>(Types::Int);
+        return std::make_shared<ValueType>(Types::Int);
     }
     else if (mbuffer[pos].val == "bytes")
     {
@@ -283,12 +325,12 @@ std::shared_ptr<ValueType> FinetStateM::pars_type()
             throw std::runtime_error("No sqr brace for bool");
         int sz = stoi(mbuffer[pos + 2].val);
         pos += 4;
-        return make_shared<ByteArrayType>(sz);
+        return std::make_shared<ByteArrayType>(sz);
     }
     else if (mbuffer[pos].val == "bool")
     {
         pos += 1;
-        return make_shared<ValueType>(Types::Bool);
+        return std::make_shared<ValueType>(Types::Bool);
     }
     else
     {
@@ -296,7 +338,4 @@ std::shared_ptr<ValueType> FinetStateM::pars_type()
     }
 }
 
-static void low_str(string &str)
-{
-    transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::tolower(c); });
-}
+
