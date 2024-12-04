@@ -25,8 +25,10 @@ enum FuncTokenTypes
     separator,
     eq,
     by,
+    to,
     mset,
     mindex,
+    minsert,
     join,
     mend,
     mnext,
@@ -42,8 +44,8 @@ using FT=FuncTokenTypes;
 #define fm_pair(x) {std::string(Q(x)), GLUE(m ## x)}
 
 
-static std::map<std::string, FuncTokenTypes> words_to_func  = {f_pair(create), f_pair(update),
-fm_pair(select), f_pair(where), f_pair(from), f_pair(by), fm_pair(set), fm_pair(index), f_pair(join), f_pair(on), fm_pair(delete)};
+static std::map<std::string, FuncTokenTypes> words_to_func  = {f_pair(create), f_pair(update), f_pair(to),
+fm_pair(select), f_pair(where), f_pair(from), f_pair(by), fm_pair(set), fm_pair(index), f_pair(join), fm_pair(insert), f_pair(on), fm_pair(delete)};
 
 
 class FuncToken

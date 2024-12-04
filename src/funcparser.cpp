@@ -618,7 +618,7 @@ mbuffer.emplace_back(yytext);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 30 "src/funcparser.l"
+#line 31 "src/funcparser.l"
 ECHO;
 	YY_BREAK
 #line 626 "src/funcparser.cpp"
@@ -1585,7 +1585,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 30 "src/funcparser.l"
+#line 31 "src/funcparser.l"
 
 
 
@@ -1609,6 +1609,10 @@ void mParser::parse(std::string input)
     std::istringstream tmp(input + std::string("\0"));
 
     FlexLexer::yylex(tmp, std::cout);
+	if (mbuffer.empty() || mbuffer.back().type != FT::mend)
+	{
+		mbuffer.push_back(FuncToken("\0"));
+	}
 }
 static std::tuple<int, std::string, std::string, std::string> get_table(int &start)
 {
@@ -1699,6 +1703,7 @@ Table DataBase::execute(std::string input)
             throw std::runtime_error("No where found in update");
         }
         std::string cond;
+
         for (; mbuffer[pos].type != FT::mend; pos++)
         {
             cond += mbuffer[pos].val;
@@ -1730,9 +1735,12 @@ Table DataBase::execute(std::string input)
         /* code */
         break;
     case FT::mselect: {
+		
+		
         int pos = 1;
         int get_all = 0;
         std::vector<std::string> col;
+		
         for (; mbuffer[pos].type != FT::from && mbuffer[pos].type != FT::mend; pos++)
         {
 			if (mbuffer[pos].type == FT::mnext)
@@ -1747,13 +1755,44 @@ Table DataBase::execute(std::string input)
         }
         pos++;
         auto response = get_table(pos);
-        
+		std::string cond;
+        if (pos >= mbuffer.size())
+		{
+			if (std::get<0>(response) == 0)
+        {
+            if (get_all)
+            {
+                return select(std::get<1>(response), getColumnOfTable(std::get<1>(response)), cond);
+            }
+            else
+            {
+                return select(std::get<1>(response), col, cond);
+            }
+            
+        }
+        else
+        {
+            Table j_table = join(std::get<1>(response), std::get<2>(response), std::get<3>(response));
+            if (get_all)
+            {
+                return j_table.select(j_table.getColumns() , cond);
+            }
+            else
+            {
+                return j_table.select(col , cond);;
+            }
+            
+            
+        }
+		}
         pos++;
-        std::string cond;
+        
         for (; mbuffer[pos].type != FT::mend; pos++)
         {
+		
             cond += mbuffer[pos].val;
         }
+
         if (std::get<0>(response) == 0)
         {
             if (get_all)
@@ -1782,6 +1821,69 @@ Table DataBase::execute(std::string input)
         }
         break;
     }
+	case FT::minsert :
+	{
+		int pos = 1;
+		if (mbuffer[pos].type != FT::open_par)
+		{
+			return Table(false);
+		}
+		int mode = 0;
+		for (int i = pos; mbuffer[i].type != FT::to && mbuffer[i].type != FT::mend; i++)
+        {
+			if (mbuffer[i].type == FT::eq)
+			{
+				mode = 1;
+				break;
+			}
+        }
+
+		pos++;
+		if (mode == 0)
+		{
+			
+			std::vector<std::optional<std::string>> val;
+			std::optional<std::string> cur_val = std::nullopt;
+			for (; mbuffer[pos].type != FT::close_par && mbuffer[pos].type != FT::mend; pos++)
+			{
+				if (mbuffer[pos].type == FT::mnext)
+				{
+					val.push_back(cur_val);
+					cur_val = std::nullopt;
+				}
+				else
+				{
+					cur_val = mbuffer[pos].val;
+				}
+			}
+			val.push_back(cur_val);
+			cur_val = std::nullopt;
+			pos++;
+			if (mbuffer[pos].type != FT::to || mbuffer[pos + 1].type != FT::other)
+			{
+				throw std::runtime_error("Some trash in insert");
+			}
+			return insertArr(mbuffer[pos + 1].val, val);
+		}
+		else
+		{
+			std::map<std::string, std::string> val;
+			for (; mbuffer[pos].type != FT::close_par && mbuffer[pos].type != FT::mend; pos += 4)
+			{
+				if (mbuffer[pos].type != FT::other || mbuffer[pos + 1].type != FT::eq || mbuffer[pos + 2].type != FT::other || mbuffer[pos + 3].type != FT::mnext)
+				{
+					val.insert({mbuffer[pos].val, mbuffer[pos + 2].val});
+				}
+			}
+			pos++;
+			if (mbuffer[pos].type != FT::to || mbuffer[pos + 1].type != FT::other)
+			{
+				throw std::runtime_error("Some trash in insert");
+			}
+			return insertMap(mbuffer[pos + 1].val, val);
+		}
+		break;
+	}
     default:
         return Table(false);
         break;
@@ -1824,9 +1926,14 @@ int FinetStateM::pars_atr()
     {
         return ans;
     }
+	pos++;
     for (; mbuffer[pos].type != FT::close_brace && mbuffer[pos].type != FT::mend; pos++)
     {
         low_str(mbuffer[pos].val);
+		if (mbuffer[pos].type == FT::mnext)
+		{
+			continue;
+		}
         if (mbuffer[pos].val == "key")
         {
             ans |= KEY;
@@ -1841,6 +1948,7 @@ int FinetStateM::pars_atr()
         }
         else
         {
+			
             throw std::runtime_error("No unknown atr was found");
         }
     }
@@ -1859,7 +1967,7 @@ std::shared_ptr<ValueType> FinetStateM::pars_type()
 {
     if (mbuffer[pos].type != FT::other)
     {
-        throw std::runtime_error("No close_brace");
+        throw std::runtime_error("No type");
     }
     low_str(mbuffer[pos].val);
     if (mbuffer[pos].val == "string")
@@ -1894,5 +2002,6 @@ std::shared_ptr<ValueType> FinetStateM::pars_type()
         throw std::runtime_error("Unknown type was found");
     }
 }
+
 
 
