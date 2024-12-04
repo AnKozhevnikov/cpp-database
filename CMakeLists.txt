@@ -6,7 +6,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(FLEX REQUIRED)
 
-message("${FLEX_INCLUDE_DIRS}")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if(NOT FLEX_INCLUDE_DIRS)
+        set(FLEX_INCLUDE_DIRS /usr/include)
+    endif()
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    if(NOT FLEX_INCLUDE_DIRS)
+        set(FLEX_INCLUDE_DIRS C:/path/to/flex/include)
+    endif()
+endif()
+
+message(STATUS "FLEX include directories: ${FLEX_INCLUDE_DIRS}")
 
 include_directories(include src ${FLEX_INCLUDE_DIRS})
 
