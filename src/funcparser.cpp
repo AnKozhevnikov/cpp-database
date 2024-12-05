@@ -1756,7 +1756,7 @@ Table DataBase::execute(std::string input)
         pos++;
         auto response = get_table(pos);
 		std::string cond;
-        if (pos >= mbuffer.size())
+        if (mbuffer[pos].type != FT::where)
 		{
 			if (std::get<0>(response) == 0)
         {
