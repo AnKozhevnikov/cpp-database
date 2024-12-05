@@ -6,7 +6,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(FLEX REQUIRED)
 
-include_directories(include src)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if(NOT FLEX_INCLUDE_DIRS)
+        set(FLEX_INCLUDE_DIRS /usr/include)
+    endif()
+endif()
+
+message(STATUS "FLEX include directories: ${FLEX_INCLUDE_DIRS}")
+
+include_directories(include src ${FLEX_INCLUDE_DIRS})
 
 add_subdirectory(tests)
 

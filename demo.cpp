@@ -19,7 +19,7 @@ int main()
 {
     DataBase db;
 
-    auto response = db.execute("create table amogus ({autoincrement} c1 : int = 0, c2 : int = 1, c3 : string)");
+    auto response = db.execute("create table amogus ({autoincrement} c1 : int32 = 0, c2 : int32 = 1, c3 : string[10])");
     response = db.execute("insert (,,\"bebra\") to amogus");
     response = db.execute("insert (,10,\"goyda\") to amogus");
     response = db.execute("select * from amogus");
