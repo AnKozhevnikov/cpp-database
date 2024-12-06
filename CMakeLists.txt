@@ -9,7 +9,6 @@ include(ExternalProject)
 set(FLEX_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flex)
 
 #This is used if you want to build flex from sources
-
 #[[
 ExternalProject_Add(
     flex-build
